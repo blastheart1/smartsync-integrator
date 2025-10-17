@@ -123,7 +123,7 @@ export default function QuickBooksPage() {
     switch (selectedData) {
       case "customers":
         return [
-          { key: "Name", label: "Customer Name", sortable: true },
+          { key: "DisplayName", label: "Customer Name", sortable: true },
           { key: "PrimaryEmailAddr", label: "Email", sortable: true, render: (value: any) => value?.Address || "N/A" },
           { key: "Balance", label: "Balance", sortable: true, render: (value: any) => `$${value || 0}` },
           { key: "Active", label: "Status", sortable: true, render: (value: any) => (
