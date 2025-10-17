@@ -1,9 +1,21 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShieldCheck, Zap, FileCode2, Database } from "lucide-react";
+import { ShieldCheck, Zap, FileCode2, Database, Github, Linkedin, Twitter, Mail } from "lucide-react";
 
 export default function Home() {
+  const techStacks = [
+    "Next.js",
+    "TypeScript",
+    "React",
+    "Tailwind CSS",
+    "QuickBooks API",
+    "Bill.com API",
+    "OAuth 2.0",
+    "Vercel",
+    "Framer Motion",
+  ];
+
   const features = [
     {
       name: "QuickBooks Integration",
@@ -116,8 +128,94 @@ export default function Home() {
         })}
       </div>
 
-      <footer className="mt-20 text-xs text-gray-400">
-        © {new Date().getFullYear()} Integration Hub
+      {/* Footer */}
+      <footer className="w-full mt-20 py-8 flex flex-col items-center gap-4 text-sm text-gray-600">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="text-center"
+        >
+          <p>
+            Developed by{" "}
+            <a
+              href="https://github.com/blastheart1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-blue-600 hover:text-blue-800 underline transition-colors"
+            >
+              BlastHeart
+            </a>
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 1.0 }}
+          className="flex flex-wrap justify-center gap-2 max-w-4xl"
+        >
+          {techStacks.map((tech, index) => (
+            <motion.span
+              key={tech}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1.2 + (index * 0.05), duration: 0.3 }}
+              className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-xs font-medium hover:bg-gray-300 transition-colors"
+            >
+              {tech}
+            </motion.span>
+          ))}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 1.4 }}
+          className="flex gap-4 mt-2"
+        >
+          <a 
+            href="https://github.com/blastheart1/smartsync-integrator" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <Github className="w-5 h-5" />
+          </a>
+          <a 
+            href="https://linkedin.com/in/blastheart" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-gray-600 hover:text-blue-600 transition-colors"
+          >
+            <Linkedin className="w-5 h-5" />
+          </a>
+          <a 
+            href="https://twitter.com/blastheart1" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-gray-600 hover:text-blue-400 transition-colors"
+          >
+            <Twitter className="w-5 h-5" />
+          </a>
+          <a 
+            href="mailto:contact@blastheart.dev" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-gray-600 hover:text-red-500 transition-colors"
+          >
+            <Mail className="w-5 h-5" />
+          </a>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.6 }}
+          className="text-xs text-gray-400 mt-4"
+        >
+          © {new Date().getFullYear()} SmartSync Integrator. All rights reserved.
+        </motion.div>
       </footer>
     </main>
   );
