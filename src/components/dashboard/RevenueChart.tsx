@@ -5,6 +5,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { TrendingUp } from "lucide-react";
 import { RevenueData } from "@/lib/utils/dashboard-analytics";
 import { validateChartData, getSafeChartProps, getSafeChartMargins, createSafeTooltipContent } from "@/lib/utils/chart-utils";
+import { useChartDimensions } from "@/lib/hooks/useChartDimensions";
 
 interface RevenueChartProps {
   data: RevenueData[];
@@ -28,6 +29,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function RevenueChart({ data, loading = false }: RevenueChartProps) {
+  const { width, height, isReady, containerRef } = useChartDimensions(300, 200);
+
   if (loading) {
     return (
       <motion.div
@@ -120,9 +123,10 @@ export default function RevenueChart({ data, loading = false }: RevenueChartProp
       </div>
 
       {/* Chart */}
-      <div className="h-64 min-h-[256px]">
-        <ResponsiveContainer {...getSafeChartProps()}>
-          <AreaChart data={safeData} margin={getSafeChartMargins()}>
+      <div ref={containerRef} className="h-64 min-h-[256px]">
+        {isReady && width > 0 && height > 0 ? (
+          <ResponsiveContainer width="100%" height="100%" minWidth={300} minHeight={200}>
+            <AreaChart data={safeData} margin={getSafeChartMargins()}>
             <defs>
               <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
@@ -161,6 +165,11 @@ export default function RevenueChart({ data, loading = false }: RevenueChartProp
             />
           </AreaChart>
         </ResponsiveContainer>
+        ) : (
+          <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg">
+            <span className="text-gray-500 text-sm">Preparing chart...</span>
+          </div>
+        )}
       </div>
 
       {/* Insight */}

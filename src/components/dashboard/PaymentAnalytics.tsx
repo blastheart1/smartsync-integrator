@@ -5,6 +5,7 @@ import { CreditCard, AlertTriangle, CheckCircle } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { PaymentStatusData, AgingData } from "@/lib/utils/dashboard-analytics";
 import { validateChartData, getSafeChartProps, getSafeChartMargins, createSafeTooltipContent } from "@/lib/utils/chart-utils";
+import { useChartDimensions } from "@/lib/hooks/useChartDimensions";
 
 interface PaymentAnalyticsProps {
   paymentStatus: PaymentStatusData[];
@@ -44,6 +45,9 @@ const AgingTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function PaymentAnalytics({ paymentStatus, agingData, loading = false }: PaymentAnalyticsProps) {
+  const { width: pieWidth, height: pieHeight, isReady: pieReady, containerRef: pieRef } = useChartDimensions(250, 200);
+  const { width: barWidth, height: barHeight, isReady: barReady, containerRef: barRef } = useChartDimensions(250, 200);
+
   if (loading) {
     return (
       <motion.div
@@ -125,9 +129,10 @@ export default function PaymentAnalytics({ paymentStatus, agingData, loading = f
         {/* Payment Status Pie Chart */}
         <div>
           <h4 className="text-sm font-semibold text-gray-900 mb-4">Payment Status Distribution</h4>
-          <div className="h-64 min-h-[256px]">
-            <ResponsiveContainer {...getSafeChartProps()}>
-              <PieChart>
+          <div ref={pieRef} className="h-64 min-h-[256px]">
+            {pieReady && pieWidth > 0 && pieHeight > 0 ? (
+              <ResponsiveContainer width="100%" height="100%" minWidth={250} minHeight={200}>
+                <PieChart>
                 <Pie
                   data={safePaymentStatus}
                   cx="50%"
@@ -152,15 +157,21 @@ export default function PaymentAnalytics({ paymentStatus, agingData, loading = f
                 )} />
               </PieChart>
             </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg">
+                <span className="text-gray-500 text-sm">Preparing chart...</span>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Aging Report Bar Chart */}
         <div>
           <h4 className="text-sm font-semibold text-gray-900 mb-4">Aging Report</h4>
-          <div className="h-64 min-h-[256px]">
-            <ResponsiveContainer {...getSafeChartProps()}>
-              <BarChart data={safeAgingData} margin={getSafeChartMargins()}>
+          <div ref={barRef} className="h-64 min-h-[256px]">
+            {barReady && barWidth > 0 && barHeight > 0 ? (
+              <ResponsiveContainer width="100%" height="100%" minWidth={250} minHeight={200}>
+                <BarChart data={safeAgingData} margin={getSafeChartMargins()}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                 <XAxis 
                   dataKey="range" 
@@ -192,6 +203,11 @@ export default function PaymentAnalytics({ paymentStatus, agingData, loading = f
                 />
               </BarChart>
             </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg">
+                <span className="text-gray-500 text-sm">Preparing chart...</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

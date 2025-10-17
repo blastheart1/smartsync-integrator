@@ -77,6 +77,21 @@ export function getSafeChartProps(width: string = "100%", height: string = "100%
 }
 
 /**
+ * Create chart container with guaranteed dimensions
+ */
+export function createChartContainer(className: string = "h-64 min-h-[256px]") {
+  return {
+    container: className,
+    responsiveProps: {
+      width: "100%",
+      height: "100%",
+      minWidth: 250,
+      minHeight: 200
+    }
+  };
+}
+
+/**
  * Create safe chart margins
  */
 export function getSafeChartMargins() {

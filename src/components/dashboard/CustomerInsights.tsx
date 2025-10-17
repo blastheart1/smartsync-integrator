@@ -5,6 +5,7 @@ import { Users, TrendingUp, Clock } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { CustomerInsight } from "@/lib/utils/dashboard-analytics";
 import { validateChartData, getSafeChartProps, getSafeChartMargins, createSafeTooltipContent } from "@/lib/utils/chart-utils";
+import { useChartDimensions } from "@/lib/hooks/useChartDimensions";
 
 interface CustomerInsightsProps {
   customers: CustomerInsight[];
@@ -27,6 +28,8 @@ const CustomerTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function CustomerInsights({ customers, loading = false }: CustomerInsightsProps) {
+  const { width, height, isReady, containerRef } = useChartDimensions(300, 200);
+
   if (loading) {
     return (
       <motion.div
@@ -100,9 +103,10 @@ export default function CustomerInsights({ customers, loading = false }: Custome
       </div>
 
       {/* Chart */}
-      <div className="h-64 min-h-[256px] mb-6">
-        <ResponsiveContainer {...getSafeChartProps()}>
-          <BarChart data={chartData} margin={{ ...getSafeChartMargins(), bottom: 60 }}>
+      <div ref={containerRef} className="h-64 min-h-[256px] mb-6">
+        {isReady && width > 0 && height > 0 ? (
+          <ResponsiveContainer width="100%" height="100%" minWidth={300} minHeight={200}>
+            <BarChart data={chartData} margin={{ ...getSafeChartMargins(), bottom: 60 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
             <XAxis 
               dataKey="name" 
@@ -138,6 +142,11 @@ export default function CustomerInsights({ customers, loading = false }: Custome
             />
           </BarChart>
         </ResponsiveContainer>
+        ) : (
+          <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg">
+            <span className="text-gray-500 text-sm">Preparing chart...</span>
+          </div>
+        )}
       </div>
 
       {/* Top Customers List */}
