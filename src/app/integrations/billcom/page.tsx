@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { Database, Building2, CreditCard, FileText, RefreshCw, Download, Eye, TrendingUp, AlertCircle, Home } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import DataTable from "@/components/ui/DataTable";
+import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+import { useToast } from "@/components/ui/Toast";
 
 interface BillData {
   vendors: any[];
@@ -18,44 +21,161 @@ export default function BillComPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastSync, setLastSync] = useState<string>("Never");
+  const [sessionInfo, setSessionInfo] = useState<any>(null);
+  
+  const { showSuccess, showError, showInfo, ToastContainer } = useToast();
 
   // Fetch real Bill.com data
   const fetchBillData = async () => {
     try {
       setLoading(true);
       setError(null);
+      showInfo("Fetching Bill.com data...");
+      
+      console.log('🔍 Starting Bill.com data fetch...');
       
       // Fetch vendors
+      console.log('📞 Fetching vendors...');
       const vendorsRes = await fetch('/api/integrations/billdotcom?endpoint=vendors');
+      console.log('📊 Vendors response status:', vendorsRes.status);
       const vendorsData = await vendorsRes.json();
+      console.log('📊 Vendors data received:', vendorsData);
       
       // Fetch bills
+      console.log('📞 Fetching bills...');
       const billsRes = await fetch('/api/integrations/billdotcom?endpoint=bills');
+      console.log('📊 Bills response status:', billsRes.status);
       const billsData = await billsRes.json();
+      console.log('📊 Bills data received:', billsData);
       
       // Fetch payments
+      console.log('📞 Fetching payments...');
       const paymentsRes = await fetch('/api/integrations/billdotcom?endpoint=payments');
+      console.log('📊 Payments response status:', paymentsRes.status);
       const paymentsData = await paymentsRes.json();
+      console.log('📊 Payments data received:', paymentsData);
       
-      setData({
+      const processedData = {
         vendors: vendorsData.data || vendorsData.vendors || [],
         bills: billsData.data || billsData.bills || [],
         payments: paymentsData.data || paymentsData.payments || [],
         spend: [] // Bill.com spend data would need separate endpoint
+      };
+      
+      console.log('📊 Processed data structure:', {
+        vendors: processedData.vendors.length,
+        bills: processedData.bills.length,
+        payments: processedData.payments.length,
+        spend: processedData.spend.length
       });
       
+      setData(processedData);
       setLastSync(new Date().toLocaleString());
+      showSuccess(`Bill.com data synced successfully! Found ${processedData.vendors.length + processedData.bills.length + processedData.payments.length} records.`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch Bill.com data');
-      console.error('Bill.com fetch error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch Bill.com data';
+      setError(errorMessage);
+      console.error('❌ Bill.com fetch error:', err);
+      showError(`Failed to sync Bill.com data: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch session status
+  const fetchSessionStatus = async () => {
+    try {
+      const response = await fetch('/api/integrations/billcom/session');
+      const result = await response.json();
+      if (result.success) {
+        setSessionInfo(result.sessionInfo);
+      }
+    } catch (error) {
+      console.error('Failed to fetch Bill.com session status:', error);
+    }
+  };
+
   useEffect(() => {
     fetchBillData();
+    fetchSessionStatus();
   }, []);
+
+  // Data table functions
+  const getCurrentData = () => {
+    switch (selectedData) {
+      case 'vendors': return data.vendors;
+      case 'bills': return data.bills;
+      case 'payments': return data.payments;
+      case 'spend': return data.spend;
+      default: return [];
+    }
+  };
+
+  const getColumns = () => {
+    switch (selectedData) {
+      case 'vendors':
+        return [
+          { key: 'name', label: 'Vendor Name', sortable: true },
+          { key: 'email', label: 'Email', sortable: true },
+          { key: 'balance', label: 'Balance', sortable: true, render: (value: number) => `$${value.toFixed(2)}` },
+          { key: 'isActive', label: 'Status', sortable: true, render: (value: boolean) => (
+            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+              value ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+            }`}>
+              {value ? "Active" : "Inactive"}
+            </span>
+          )}
+        ];
+      case 'bills':
+        return [
+          { key: 'invoiceNumber', label: 'Invoice Number', sortable: true },
+          { key: 'vendor.name', label: 'Vendor', sortable: true },
+          { key: 'amount', label: 'Amount', sortable: true, render: (value: number) => `$${value.toFixed(2)}` },
+          { key: 'dueDate', label: 'Due Date', sortable: true },
+          { key: 'status', label: 'Status', sortable: true, render: (value: string) => (
+            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+              value === "Approved" ? "bg-green-100 text-green-800" :
+              value === "Pending" ? "bg-yellow-100 text-yellow-800" : "bg-gray-100 text-gray-800"
+            }`}>
+              {value || 'Unknown'}
+            </span>
+          )},
+          { key: 'category', label: 'Category', sortable: true }
+        ];
+      case 'payments':
+        return [
+          { key: 'referenceNumber', label: 'Reference Number', sortable: true },
+          { key: 'vendor.name', label: 'Vendor', sortable: true },
+          { key: 'amount', label: 'Amount', sortable: true, render: (value: number) => `$${value.toFixed(2)}` },
+          { key: 'paymentDate', label: 'Payment Date', sortable: true },
+          { key: 'paymentMethod', label: 'Method', sortable: true },
+          { key: 'status', label: 'Status', sortable: true, render: (value: string) => (
+            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+              value === "Completed" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+            }`}>
+              {value || 'Unknown'}
+            </span>
+          )}
+        ];
+      case 'spend':
+        return [
+          { key: 'transactionId', label: 'Transaction ID', sortable: true },
+          { key: 'user.name', label: 'Employee', sortable: true },
+          { key: 'amount', label: 'Amount', sortable: true, render: (value: number) => `$${value.toFixed(2)}` },
+          { key: 'transactionDate', label: 'Date', sortable: true },
+          { key: 'category', label: 'Category', sortable: true },
+          { key: 'status', label: 'Status', sortable: true, render: (value: string) => (
+            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+              value === "Approved" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+            }`}>
+              {value || 'Unknown'}
+            </span>
+          )}
+        ];
+      default:
+        return [];
+    }
+  };
 
   const dataTypes = [
     { key: "vendors", label: "Vendors", icon: Building2, count: data.vendors.length },
@@ -75,6 +195,7 @@ export default function BillComPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 py-8">
+      <ToastContainer />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -145,6 +266,34 @@ export default function BillComPage() {
           </div>
         </motion.div>
 
+        {/* Session Status */}
+        {sessionInfo && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="bg-white rounded-lg shadow-md border border-gray-200 p-4 mb-8"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-green-800">
+                <RefreshCw className="w-4 h-4" />
+                <span className="text-sm font-medium">Bill.com Session Status:</span>
+              </div>
+              <div className="text-sm text-green-600">
+                {sessionInfo.hasSession ? (
+                  sessionInfo.sessionInfo.isExpired ? (
+                    <span className="text-red-600">Session Expired</span>
+                  ) : (
+                    <span>Expires in {sessionInfo.sessionInfo.expiresInMinutes} min</span>
+                  )
+                ) : (
+                  <span>No Active Session</span>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Data Type Selector */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -183,175 +332,35 @@ export default function BillComPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white rounded-lg shadow-md border border-gray-200"
         >
-          <div className="px-6 py-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {dataTypes.find(t => t.key === selectedData)?.label} Data
-              </h2>
-              <div className="flex space-x-2">
-                <button 
+          {loading ? (
+            <LoadingSkeleton rows={8} columns={5} />
+          ) : error ? (
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8">
+              <div className="text-center">
+                <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Error Loading Data</h3>
+                <p className="text-gray-600 mb-4">{error}</p>
+                <button
                   onClick={fetchBillData}
-                  disabled={loading}
-                  className="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors text-sm"
+                  className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
                 >
-                  <RefreshCw className={`w-4 h-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
-                  Refresh
-                </button>
-                <button className="flex items-center bg-gray-100 text-gray-700 px-3 py-2 rounded-md hover:bg-gray-200 transition-colors text-sm">
-                  <Eye className="w-4 h-4 mr-1" />
-                  View Details
-                </button>
-                <button className="flex items-center bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition-colors text-sm">
-                  <Download className="w-4 h-4 mr-1" />
-                  Export
+                  Try Again
                 </button>
               </div>
             </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  {selectedData === "vendors" && (
-                    <>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    </>
-                  )}
-                  {selectedData === "bills" && (
-                    <>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bill ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                    </>
-                  )}
-                  {selectedData === "payments" && (
-                    <>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    </>
-                  )}
-                  {selectedData === "spend" && (
-                    <>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expense ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    </>
-                  )}
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {loading ? (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center">
-                      <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-gray-400" />
-                      <p className="text-sm text-gray-500">Loading data...</p>
-                    </td>
-                  </tr>
-                ) : error ? (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center">
-                      <div className="flex items-center justify-center gap-2 text-red-600">
-                        <AlertCircle className="w-5 h-5" />
-                        <span className="text-sm">{error}</span>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  <>
-                    {selectedData === "vendors" && data.vendors.map((vendor: any) => (
-                      <tr key={vendor.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{vendor.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{vendor.email || 'N/A'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${vendor.balance || 0}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            vendor.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                          }`}>
-                            {vendor.isActive ? "Active" : "Inactive"}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                    {selectedData === "bills" && data.bills.map((bill: any) => (
-                      <tr key={bill.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{bill.invoiceNumber}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{bill.vendor?.name || 'N/A'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${bill.amount || 0}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{bill.dueDate || 'N/A'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            bill.status === "Approved" ? "bg-green-100 text-green-800" :
-                            bill.status === "Pending" ? "bg-yellow-100 text-yellow-800" : "bg-gray-100 text-gray-800"
-                          }`}>
-                            {bill.status || 'Unknown'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{bill.category || 'N/A'}</td>
-                      </tr>
-                    ))}
-                    {selectedData === "payments" && data.payments.map((payment: any) => (
-                      <tr key={payment.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{payment.referenceNumber}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{payment.vendor?.name || 'N/A'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${payment.amount || 0}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{payment.paymentDate || 'N/A'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{payment.paymentMethod || 'N/A'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            payment.status === "Completed" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                          }`}>
-                            {payment.status || 'Unknown'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                    {selectedData === "spend" && data.spend.map((expense: any) => (
-                      <tr key={expense.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{expense.transactionId}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{expense.user?.name || 'N/A'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${expense.amount || 0}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{expense.transactionDate || 'N/A'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{expense.category || 'N/A'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            expense.status === "Approved" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                          }`}>
-                            {expense.status || 'Unknown'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                    {((selectedData === "vendors" && data.vendors.length === 0) ||
-                      (selectedData === "bills" && data.bills.length === 0) ||
-                      (selectedData === "payments" && data.payments.length === 0) ||
-                      (selectedData === "spend" && data.spend.length === 0)) && (
-                      <tr>
-                        <td colSpan={6} className="px-6 py-8 text-center text-sm text-gray-500">
-                          No {dataTypes.find(dt => dt.key === selectedData)?.label.toLowerCase()} found in your Bill.com account.
-                        </td>
-                      </tr>
-                    )}
-                  </>
-                )}
-              </tbody>
-            </table>
-          </div>
+          ) : (
+            <DataTable
+              data={getCurrentData()}
+              columns={getColumns()}
+              title={`${dataTypes.find(t => t.key === selectedData)?.label} Data`}
+              searchable={true}
+              exportable={true}
+              onExport={() => {
+                showSuccess(`${dataTypes.find(t => t.key === selectedData)?.label} data exported successfully!`);
+              }}
+            />
+          )}
         </motion.div>
 
         {/* API Information */}
@@ -366,11 +375,11 @@ export default function BillComPage() {
             <div>
               <h4 className="font-medium text-green-900 mb-2">Authentication & Setup</h4>
               <ul className="text-sm text-green-800 space-y-1">
-                <li>• API Key authentication</li>
-                <li>• Sandbox environment enabled</li>
-                <li>• Organization ID: sandbox-org-id</li>
-                <li>• Base URL: gateway.stage.bill.com</li>
-                <li>• <a href="https://developer.bill.com/docs/home" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Official Bill.com API Docs</a></li>
+                <li>• Session-based authentication</li>
+                <li>• Developer key required</li>
+                <li>• Sandbox environment available</li>
+                <li>• Base URL: api.bill.com/api/v3/</li>
+                <li>• <a href="https://developer.bill.com/docs/home" className="text-green-600 hover:underline" target="_blank" rel="noopener noreferrer">Official Bill.com v3 API Docs</a></li>
               </ul>
             </div>
             <div>
@@ -393,6 +402,15 @@ export default function BillComPage() {
                 <li>• Multi-payment method support</li>
               </ul>
             </div>
+          </div>
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <div className="flex items-center gap-2 text-blue-800">
+              <RefreshCw className="w-4 h-4" />
+              <span className="text-sm font-medium">Real API Integration:</span>
+            </div>
+            <p className="text-sm text-blue-700 mt-1">
+              Real Bill.com v3 API integration is now active! Add BILL_PASSWORD and BILL_ORG_ID to your environment variables to use real data instead of mock data.
+            </p>
           </div>
         </motion.div>
       </div>

@@ -1,12 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FileCode2, Users, DollarSign, TrendingUp, RefreshCw, Download, Eye, AlertCircle, Home } from "lucide-react";
+import { FileCode2, Users, DollarSign, TrendingUp, RefreshCw, Download, Eye, AlertCircle, Home, BarChart3, Table } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import DataTable from "@/components/ui/DataTable";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import { useToast } from "@/components/ui/Toast";
+import QuickBooksDashboard from "@/components/dashboard/QuickBooksDashboard";
 
 interface QBData {
   customers: any[];
@@ -15,6 +16,7 @@ interface QBData {
 }
 
 export default function QuickBooksPage() {
+  const [activeTab, setActiveTab] = useState<"dashboard" | "data">("dashboard");
   const [selectedData, setSelectedData] = useState("customers");
   const [data, setData] = useState<QBData>({ customers: [], invoices: [], payments: [] });
   const [loading, setLoading] = useState(true);
@@ -268,14 +270,71 @@ export default function QuickBooksPage() {
           )}
         </motion.div>
 
-        {/* Data Type Selector */}
+        {/* Tab Navigation */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-lg shadow-md p-6 border border-gray-200 mb-8"
+          transition={{ delay: 0.15 }}
+          className="bg-white rounded-lg shadow-md border border-gray-200 mb-8"
         >
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">QuickBooks Data</h2>
+          <div className="border-b border-gray-200">
+            <nav className="flex space-x-8 px-6" aria-label="Tabs">
+              <button
+                onClick={() => setActiveTab("dashboard")}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "dashboard"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                <div className="flex items-center">
+                  <BarChart3 className="w-5 h-5 mr-2" />
+                  Analytics Dashboard
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab("data")}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "data"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                <div className="flex items-center">
+                  <Table className="w-5 h-5 mr-2" />
+                  Raw Data Tables
+                </div>
+              </button>
+            </nav>
+          </div>
+        </motion.div>
+
+        {/* Dashboard Tab Content */}
+        {activeTab === "dashboard" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <QuickBooksDashboard 
+              data={data} 
+              loading={loading}
+              onRefresh={fetchQBData}
+            />
+          </motion.div>
+        )}
+
+        {/* Data Tab Content */}
+        {activeTab === "data" && (
+          <>
+            {/* Data Type Selector */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-lg shadow-md p-6 border border-gray-200 mb-8"
+            >
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">QuickBooks Data</h2>
           <div className="grid md:grid-cols-3 gap-4">
             {dataTypes.map((type) => {
               const Icon = type.icon;
@@ -336,6 +395,8 @@ export default function QuickBooksPage() {
             />
           )}
         </motion.div>
+          </>
+        )}
       </div>
     </main>
   );

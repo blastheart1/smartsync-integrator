@@ -7,6 +7,8 @@ export const env = {
   QB_ACCESS_TOKEN: process.env.QB_ACCESS_TOKEN || "",
   QB_REFRESH_TOKEN: process.env.QB_REFRESH_TOKEN || "",
   BILL_API_KEY: process.env.BILL_API_KEY || "",
+  BILL_PASSWORD: process.env.BILL_PASSWORD || "",
+  BILL_ORG_ID: process.env.BILL_ORG_ID || "",
   ZAPIER_HOOK_URL: process.env.ZAPIER_HOOK_URL || "",
   NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || "",
   ADMIN_USER: process.env.ADMIN_USER || "",
@@ -20,4 +22,6 @@ if (typeof window === 'undefined') {
   console.log('  - QB_ACCESS_TOKEN:', process.env.QB_ACCESS_TOKEN ? `${process.env.QB_ACCESS_TOKEN.substring(0, 20)}...` : 'MISSING');
   console.log('  - QB_REFRESH_TOKEN:', process.env.QB_REFRESH_TOKEN ? `${process.env.QB_REFRESH_TOKEN.substring(0, 20)}...` : 'MISSING');
   console.log('  - BILL_API_KEY:', process.env.BILL_API_KEY ? `${process.env.BILL_API_KEY.substring(0, 20)}...` : 'MISSING');
+  console.log('  - BILL_PASSWORD:', process.env.BILL_PASSWORD ? `${process.env.BILL_PASSWORD.substring(0, 10)}...` : 'MISSING');
+  console.log('  - BILL_ORG_ID:', process.env.BILL_ORG_ID ? `${process.env.BILL_ORG_ID.substring(0, 10)}...` : 'MISSING');
 }

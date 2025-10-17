@@ -1,5 +1,5 @@
 import { env } from "@/lib/env";
-import { getValidAccessToken } from "./quickbooks-token-storage";
+import { getValidAccessToken, handle401Error } from "./quickbooks-token-storage";
 
 export async function fetchQuickBooksData(endpoint: string) {
   console.log('🔍 QuickBooks fetchDebug - Starting API call');
@@ -46,31 +46,38 @@ export async function fetchQuickBooksData(endpoint: string) {
     if (res.status === 401) {
       console.log('🔄 Got 401 Unauthorized, attempting token refresh...');
       try {
-        const { forceRefreshToken } = await import('./quickbooks-token-storage');
-        const newAccessToken = await forceRefreshToken();
+        // Use the handle401Error function for cleaner retry logic
+        const retryFunction = async () => {
+          const newAccessToken = await getValidAccessToken();
+          
+          console.log('🔄 Retrying request with refreshed token...');
+          const retryRes = await fetch(fullUrl, {
+            headers: {
+              Authorization: `Bearer ${newAccessToken}`,
+              Accept: "application/json",
+              'Content-Type': 'application/json'
+            },
+          });
+          
+          if (retryRes.ok) {
+            console.log('✅ Retry successful with refreshed token');
+            const data = await retryRes.json();
+            console.log('📊 Response data:', data);
+            console.log('🔍 Data structure analysis:');
+            console.log('  - Has QueryResponse:', !!data.QueryResponse);
+            console.log('  - QueryResponse keys:', data.QueryResponse ? Object.keys(data.QueryResponse) : 'N/A');
+            return data;
+          } else {
+            console.log('❌ Retry failed:', retryRes.status, retryRes.statusText);
+            const retryErrorData = await retryRes.json().catch(() => ({}));
+            throw new Error(`QuickBooks retry failed: ${retryRes.status} ${retryRes.statusText} - ${retryErrorData.Fault?.Error?.[0]?.Detail || 'Unknown error'}`);
+          }
+        };
         
-        console.log('🔄 Retrying request with refreshed token...');
-        const retryRes = await fetch(fullUrl, {
-          headers: {
-            Authorization: `Bearer ${newAccessToken}`,
-            Accept: "application/json",
-            'Content-Type': 'application/json'
-          },
-        });
-        
-        if (retryRes.ok) {
-          console.log('✅ Retry successful with refreshed token');
-          const data = await retryRes.json();
-          console.log('📊 Response data:', data);
-          console.log('🔍 Data structure analysis:');
-          console.log('  - Has QueryResponse:', !!data.QueryResponse);
-          console.log('  - QueryResponse keys:', data.QueryResponse ? Object.keys(data.QueryResponse) : 'N/A');
-          return data;
-        } else {
-          console.log('❌ Retry failed:', retryRes.status, retryRes.statusText);
-        }
+        return await handle401Error(retryFunction);
       } catch (refreshError) {
         console.error('❌ Token refresh failed:', refreshError);
+        throw refreshError;
       }
     }
     

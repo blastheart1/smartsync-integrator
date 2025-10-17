@@ -7,10 +7,6 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Disable experimental features that cause permission issues
-  experimental: {
-    // Disable any features that might create trace files
-  },
 };
 
 export default nextConfig;
