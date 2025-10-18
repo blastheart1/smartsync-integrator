@@ -111,15 +111,15 @@ export default function Home() {
               }`}>
                 {feature.name}
               </h3>
-              <p className={`text-sm leading-relaxed ${
+              <p className={`text-sm leading-relaxed mb-4 h-16 line-clamp-4 ${
                 feature.isEnabled ? 'text-gray-500' : 'text-gray-400'
               }`}>
                 {feature.description}
               </p>
-              <div className={`mt-4 text-xs font-medium ${
+              <div className={`mt-auto text-xs font-medium ${
                 feature.isEnabled 
                   ? 'text-blue-600 group-hover:text-blue-700' 
-                  : 'text-gray-400'
+                  : 'text-orange-500'
               }`}>
                 {feature.isEnabled ? 'Explore Integration →' : 'Coming Soon'}
               </div>

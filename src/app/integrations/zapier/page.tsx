@@ -406,7 +406,7 @@ export default function ZapierPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {zapTemplates.map((template) => (
-              <div key={template.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+              <div key={template.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow flex flex-col">
                 <div className="flex items-start justify-between mb-2">
                   <h3 className="font-medium text-gray-900">{template.name}</h3>
                   {template.isPopular && (
@@ -415,8 +415,8 @@ export default function ZapierPage() {
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-600 mb-3">{template.description}</p>
-                <div className="space-y-1 mb-3">
+                <p className="text-sm text-gray-600 mb-3 h-12 line-clamp-3 leading-4">{template.description}</p>
+                <div className="space-y-1 mb-3 flex-grow">
                   <div className="text-xs text-gray-500">
                     <span className="font-medium">Trigger:</span> {template.trigger}
                   </div>
@@ -432,7 +432,7 @@ export default function ZapierPage() {
                     window.open('https://zapier.com/apps/quickbooks/integrations', '_blank');
                     showInfo("Opening Zapier QuickBooks integrations in new tab");
                   }}
-                  className="w-full flex items-center justify-center bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm"
+                  className="w-full flex items-center justify-center bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm mt-auto"
                 >
                   <ExternalLink className="w-4 h-4 mr-2" />
                   Create in Zapier
