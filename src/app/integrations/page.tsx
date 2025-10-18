@@ -257,36 +257,17 @@ export default function IntegrationsPage() {
                   Last sync: {integration.lastSync}
                 </div>
 
-                <div className="relative">
-                  <button
-                    onClick={() => integration.isEnabled && setActiveTab(integration.name.toLowerCase().replace(/\s+/g, ''))}
-                    disabled={!integration.isEnabled}
-                    className={`w-full py-2 px-4 rounded-md transition-colors text-sm ${
-                      integration.isEnabled 
-                        ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                  >
-                    {integration.isEnabled ? 'Manage Integration' : 'Coming Soon'}
-                  </button>
-                  {integration.isEnabled && (
-                    <div className="absolute -top-2 -right-2">
-                      <div className="relative group">
-                        <Info className="w-4 h-4 text-blue-500 cursor-help bg-white rounded-full p-0.5 shadow-sm" />
-                        <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 w-64">
-                          <div className="text-center">
-                            <div className="font-semibold mb-1">Demo Interface</div>
-                            <div>
-                              This configuration panel demonstrates the concept of managing integration settings through a user-friendly interface. 
-                              In production, this would allow updating API credentials and sync preferences without manual file editing.
-                            </div>
-                          </div>
-                          <div className="absolute top-full right-4 border-4 border-transparent border-t-gray-800"></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <button
+                  onClick={() => integration.isEnabled && setActiveTab(integration.name.toLowerCase().replace(/\s+/g, ''))}
+                  disabled={!integration.isEnabled}
+                  className={`w-full py-2 px-4 rounded-md transition-colors text-sm ${
+                    integration.isEnabled 
+                      ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  {integration.isEnabled ? 'Manage Integration' : 'Coming Soon'}
+                </button>
               </motion.div>
             );
           })}
@@ -471,6 +452,14 @@ export default function IntegrationsPage() {
               <h2 className="text-lg font-semibold text-gray-900">
                 {integrations.find(i => i.name.toLowerCase().replace(/\s+/g, '') === activeTab)?.name} Configuration
               </h2>
+            </div>
+            
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <p className="text-sm text-blue-800">
+                <strong>Note:</strong> This configuration panel is for demonstration purposes. 
+                It shows the concept of managing integration settings through a user-friendly interface. 
+                In a production environment, this would allow updating API credentials and sync preferences without manual file editing.
+              </p>
             </div>
             
             <div className="grid md:grid-cols-2 gap-6">
