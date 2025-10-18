@@ -38,8 +38,8 @@ export default function Home() {
       description:
         "Connect CRMs, finance tools, and analytics pipelines with automated triggers and actions.",
       icon: Zap,
-      isEnabled: false,
-      status: "coming_soon"
+      isEnabled: true,
+      status: "available"
     },
     {
       name: "Security & Compliance",
@@ -78,7 +78,7 @@ export default function Home() {
               case "Bill.com Automation":
                 return "/integrations/billcom";
               case "Zapier Workflows":
-                return "/integrations";
+                return "/integrations/zapier";
               case "Security & Compliance":
                 return "/integrations";
               default:
