@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShieldCheck, Zap, FileCode2, Database, Github, Linkedin, Twitter, Mail } from "lucide-react";
+import { ShieldCheck, Zap, FileCode2, Database, Facebook, Instagram, Linkedin, Twitter, Mail } from "lucide-react";
 
 export default function Home() {
   const techStacks = [
@@ -138,14 +138,9 @@ export default function Home() {
         >
           <p>
             Developed by{" "}
-            <a
-              href="https://github.com/blastheart1"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-blue-600 hover:text-blue-800 underline transition-colors"
-            >
-              BlastHeart
-            </a>
+            <span className="font-semibold text-blue-600">
+              Luis Santos
+            </span>
           </p>
         </motion.div>
 
@@ -175,15 +170,23 @@ export default function Home() {
           className="flex gap-4 mt-2"
         >
           <a 
-            href="https://github.com/blastheart1/smartsync-integrator" 
+            href="https://www.facebook.com/AntonioLuisASantos/" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="text-gray-600 hover:text-gray-900 transition-colors"
+            className="text-gray-600 hover:text-blue-600 transition-colors"
           >
-            <Github className="w-5 h-5" />
+            <Facebook className="w-5 h-5" />
           </a>
           <a 
-            href="https://linkedin.com/in/blastheart" 
+            href="https://www.instagram.com/0xlv1s_/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-gray-600 hover:text-pink-500 transition-colors"
+          >
+            <Instagram className="w-5 h-5" />
+          </a>
+          <a 
+            href="https://www.linkedin.com/in/alasantos01/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-gray-600 hover:text-blue-600 transition-colors"
@@ -191,15 +194,7 @@ export default function Home() {
             <Linkedin className="w-5 h-5" />
           </a>
           <a 
-            href="https://twitter.com/blastheart1" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-gray-600 hover:text-blue-400 transition-colors"
-          >
-            <Twitter className="w-5 h-5" />
-          </a>
-          <a 
-            href="mailto:contact@blastheart.dev" 
+            href="mailto:antonioluis.santos1@gmail.com" 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-gray-600 hover:text-red-500 transition-colors"
