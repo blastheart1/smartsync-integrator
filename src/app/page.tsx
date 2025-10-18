@@ -138,9 +138,14 @@ export default function Home() {
         >
           <p>
             Developed by{" "}
-            <span className="font-semibold text-blue-600">
+            <a 
+              href="https://luis-dev-porfolio.vercel.app/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+            >
               Luis Santos
-            </span>
+            </a>
           </p>
         </motion.div>
 

@@ -200,7 +200,7 @@ export default function IntegrationsPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className={`bg-white rounded-lg shadow-md p-6 border border-gray-200 ${
+                className={`bg-white rounded-lg shadow-md p-6 border border-gray-200 flex flex-col ${
                   !integration.isEnabled ? 'opacity-60' : ''
                 }`}
               >
@@ -234,11 +234,11 @@ export default function IntegrationsPage() {
                   </div>
                 </div>
                 
-                <p className={`text-sm mb-4 ${
+                <p className={`text-sm mb-4 h-10 line-clamp-2 ${
                   integration.isEnabled ? 'text-gray-600' : 'text-gray-400'
                 }`}>{integration.description}</p>
                 
-                <div className="space-y-2 mb-4">
+                <div className="space-y-2 mb-4 flex-grow">
                   {integration.features.map((feature, idx) => (
                     <div key={idx} className={`flex items-center text-sm ${
                       integration.isEnabled ? 'text-gray-500' : 'text-gray-400'
@@ -260,7 +260,7 @@ export default function IntegrationsPage() {
                 <button
                   onClick={() => integration.isEnabled && setActiveTab(integration.name.toLowerCase().replace(/\s+/g, ''))}
                   disabled={!integration.isEnabled}
-                  className={`w-full py-2 px-4 rounded-md transition-colors text-sm ${
+                  className={`w-full py-2 px-4 rounded-md transition-colors text-sm mt-auto ${
                     integration.isEnabled 
                       ? 'bg-blue-600 text-white hover:bg-blue-700' 
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
