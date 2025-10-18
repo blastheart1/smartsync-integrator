@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FileCode2, Database, Zap, Settings, TestTube, CheckCircle, AlertCircle, Terminal, Play, Square } from "lucide-react";
+import { FileCode2, Database, Zap, Settings, TestTube, CheckCircle, AlertCircle, Terminal, Play, Square, Home, Info } from "lucide-react";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function IntegrationsPage() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -175,7 +176,17 @@ export default function IntegrationsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Integration Management</h1>
+          <div className="flex items-center justify-between mb-4">
+            <div></div>
+            <h1 className="text-3xl font-bold text-gray-900">Integration Management</h1>
+            <Link 
+              href="/" 
+              className="flex items-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors"
+            >
+              <Home className="w-5 h-5 mr-2" />
+              Home
+            </Link>
+          </div>
           <p className="text-gray-600">Manage and monitor your third-party integrations</p>
         </motion.div>
 
@@ -441,6 +452,19 @@ export default function IntegrationsPage() {
               <h2 className="text-lg font-semibold text-gray-900">
                 {integrations.find(i => i.name.toLowerCase().replace(/\s+/g, '') === activeTab)?.name} Configuration
               </h2>
+              <div className="ml-2 relative group">
+                <Info className="w-4 h-4 text-gray-400 cursor-help" />
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                  <div className="text-center">
+                    <div className="font-semibold mb-1">Demo Interface</div>
+                    <div className="max-w-xs">
+                      This configuration panel demonstrates the concept of managing integration settings through a user-friendly interface. 
+                      In a production environment, this would allow users to update API credentials and sync preferences without manual file editing.
+                    </div>
+                  </div>
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                </div>
+              </div>
             </div>
             
             <div className="grid md:grid-cols-2 gap-6">
