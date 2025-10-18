@@ -76,20 +76,46 @@ export default function DataTable({
     }
   };
 
+  const getExportValue = (col: Column, row: any) => {
+    const value = row[col.key];
+    
+    // Use the column's render function if it exists
+    if (col.render) {
+      const renderedValue = col.render(value, row);
+      // If render returns JSX, extract text content
+      if (typeof renderedValue === 'object' && renderedValue !== null) {
+        // Handle JSX elements by extracting text content
+        if (renderedValue.props && renderedValue.props.children) {
+          return renderedValue.props.children;
+        }
+        return String(renderedValue);
+      }
+      return String(renderedValue);
+    }
+    
+    // Handle nested object values (e.g., vendor.name)
+    if (col.key.includes('.')) {
+      const keys = col.key.split('.');
+      const nestedValue = keys.reduce((obj, key) => obj?.[key], row);
+      return nestedValue || "";
+    }
+    
+    // Handle direct object values
+    if (typeof value === "object" && value !== null) {
+      return JSON.stringify(value);
+    }
+    
+    return value || "";
+  };
+
   const exportToCSV = () => {
     if (!filteredData.length) return;
     
     const headers = columns.map(col => col.label).join(",");
     const rows = filteredData.map(row => 
       columns.map(col => {
-        const value = row[col.key];
-        // Handle nested object values (e.g., vendor.name)
-        if (col.key.includes('.')) {
-          const keys = col.key.split('.');
-          const nestedValue = keys.reduce((obj, key) => obj?.[key], row);
-          return `"${nestedValue || ""}"`;
-        }
-        return typeof value === "object" ? JSON.stringify(value) : `"${value || ""}"`;
+        const value = getExportValue(col, row);
+        return `"${String(value).replace(/"/g, '""')}"`; // Escape quotes in CSV
       }).join(",")
     );
     
@@ -111,20 +137,8 @@ export default function DataTable({
     const cleanedData = filteredData.map(row => {
       const cleanedRow: any = {};
       columns.forEach(col => {
-        let value = row[col.key];
-        
-        // Handle nested object values
-        if (col.key.includes('.')) {
-          const keys = col.key.split('.');
-          value = keys.reduce((obj, key) => obj?.[key], row);
-        }
-        
-        // Clean up the value
-        if (typeof value === 'object' && value !== null) {
-          cleanedRow[col.label] = value;
-        } else {
-          cleanedRow[col.label] = value || '';
-        }
+        const value = getExportValue(col, row);
+        cleanedRow[col.label] = value;
       });
       return cleanedRow;
     });
@@ -155,15 +169,8 @@ export default function DataTable({
           ${filteredData.map(row => `
             <tr>
               ${columns.map(col => {
-                let value = row[col.key];
-                
-                // Handle nested object values
-                if (col.key.includes('.')) {
-                  const keys = col.key.split('.');
-                  value = keys.reduce((obj, key) => obj?.[key], row);
-                }
-                
-                return `<td>${value || ''}</td>`;
+                const value = getExportValue(col, row);
+                return `<td>${String(value).replace(/</g, '&lt;').replace(/>/g, '&gt;')}</td>`;
               }).join('')}
             </tr>
           `).join('')}
