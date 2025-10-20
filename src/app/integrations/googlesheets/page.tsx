@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { 
   Plus,
@@ -45,7 +45,7 @@ interface IntegrationMapping {
   syncFrequency: string;
 }
 
-export default function GoogleSheetsPage() {
+function GoogleSheetsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("overview");
@@ -833,5 +833,20 @@ export default function GoogleSheetsPage() {
       )}
       
     </div>
+  );
+}
+
+export default function GoogleSheetsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading Google Sheets...</p>
+        </div>
+      </div>
+    }>
+      <GoogleSheetsPageContent />
+    </Suspense>
   );
 }
