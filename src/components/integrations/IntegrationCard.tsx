@@ -67,43 +67,57 @@ export default function IntegrationCard({ provider, onUse }: Props) {
   };
 
   return (
-    <Link href={`/integrations/${provider.key}`} onClick={handleClick} className={provider.status === "coming_soon" ? "pointer-events-none" : undefined}>
+    <Link 
+      href={`/integrations/${provider.key}`} 
+      onClick={handleClick} 
+      className={`block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-xl ${provider.status === "coming_soon" ? "pointer-events-none" : ""}`}
+      tabIndex={provider.status === "coming_soon" ? -1 : 0}
+      aria-disabled={provider.status === "coming_soon"}
+    >
       <motion.div
         whileHover={{ y: -2 }}
-        className={`rounded-xl border border-gray-200 bg-white shadow-sm p-5 h-full flex flex-col transition-colors ${
-          provider.status === "coming_soon" ? "opacity-60" : "hover:border-gray-300"
+        className={`rounded-xl border shadow-sm p-5 h-[200px] flex flex-col transition-colors ${
+          provider.status === "coming_soon" 
+            ? "border-gray-200 bg-gray-50" 
+            : "border-gray-200 bg-white hover:border-gray-300"
         }`}
       >
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between mb-3 h-12">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
             <ProviderIcon provider={provider} />
-            <div>
-              <div className="text-sm font-semibold text-gray-900">{provider.name}</div>
-              <div className="text-xs text-gray-500">{provider.category}</div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-semibold text-gray-900 truncate">{provider.name}</div>
+              <div className="text-xs text-gray-600 truncate">{provider.category}</div>
             </div>
           </div>
           <span
-            className="text-[10px] uppercase font-semibold px-2 py-1 rounded"
-            style={{ background: "#F3F4F6", color: "#374151" }}
+            className="text-[11px] uppercase font-semibold px-2 py-1 rounded flex-shrink-0 ml-2"
+            style={{ background: "#E5E7EB", color: "#1F2937" }}
+            role="status"
+            aria-label={`Integration status: ${statusLabel}`}
           >
             {statusLabel}
           </span>
         </div>
 
-        <p className="text-sm text-gray-600 mb-4 line-clamp-2">{provider.description}</p>
+        <p className="text-sm text-gray-600 mb-4 line-clamp-2 min-h-[2.5rem]">{provider.description}</p>
 
-        <div className="mt-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="mt-auto">
+          {/* Badges - always show exactly 3, truncate if more */}
+          <div className="flex items-center gap-2 mb-3 h-6">
             {provider.capability.entities.slice(0, 3).map((e) => (
-              <span key={e} className="text-[10px] bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">
+              <span key={e} className="text-[11px] bg-gray-200 text-gray-800 px-2 py-0.5 rounded-full truncate max-w-[80px]">
                 {e}
               </span>
             ))}
-            {provider.capability.entities.length > 3 && (
-              <span className="text-[10px] text-gray-500">+{provider.capability.entities.length - 3}</span>
-            )}
           </div>
-          <span className="text-xs font-medium text-blue-600">{provider.status === "coming_soon" ? "Soon" : "Explore →"}</span>
+          
+          {/* Explore button - always on its own line */}
+          <div className="flex justify-end h-6">
+            <span className="text-xs font-medium text-blue-600">
+              {provider.status === "coming_soon" ? "Soon" : "Explore →"}
+            </span>
+          </div>
         </div>
       </motion.div>
     </Link>

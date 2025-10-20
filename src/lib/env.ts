@@ -14,6 +14,9 @@ export const env = {
   get NEXTAUTH_SECRET() { return process.env.NEXTAUTH_SECRET || ""; },
   get ADMIN_USER() { return process.env.ADMIN_USER || ""; },
   get ADMIN_PASS() { return process.env.ADMIN_PASS || ""; },
+  get GOOGLE_CLIENT_ID() { return process.env.GOOGLE_CLIENT_ID || ""; },
+  get GOOGLE_CLIENT_SECRET() { return process.env.GOOGLE_CLIENT_SECRET || ""; },
+  get GOOGLE_REDIRECT_URI() { return process.env.GOOGLE_REDIRECT_URI || ""; },
 };
 
 // Debug environment variables on server startup (disabled during build)

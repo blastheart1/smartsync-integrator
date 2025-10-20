@@ -64,9 +64,9 @@ export default function Home() {
         <h1 className="text-4xl font-semibold tracking-tight mb-4 text-gray-900">
           Integration Management Hub
         </h1>
-        <p className="text-gray-500 text-base leading-relaxed">
-          A secure workspace to manage automations and API connections. 
-          QuickBooks integration is fully operational, with Bill.com and Zapier coming soon.
+        <p className="text-gray-600 text-base leading-relaxed">
+          A secure workspace to manage automations and API connections across your entire business ecosystem. 
+          Connect, sync, and automate workflows between your favorite tools and platforms.
         </p>
       </motion.div>
 
@@ -128,7 +128,8 @@ export default function Home() {
             href="https://www.facebook.com/AntonioLuisASantos/" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="text-gray-600 hover:text-blue-600 transition-colors"
+            className="text-gray-700 hover:text-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1"
+            aria-label="Visit Facebook profile"
           >
             <Facebook className="w-5 h-5" />
           </a>
@@ -136,7 +137,8 @@ export default function Home() {
             href="https://www.instagram.com/0xlv1s_/" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="text-gray-600 hover:text-pink-500 transition-colors"
+            className="text-gray-700 hover:text-pink-500 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 rounded-lg p-1"
+            aria-label="Visit Instagram profile"
           >
             <Instagram className="w-5 h-5" />
           </a>
@@ -144,7 +146,8 @@ export default function Home() {
             href="https://www.linkedin.com/in/alasantos01/" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="text-gray-600 hover:text-blue-600 transition-colors"
+            className="text-gray-700 hover:text-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1"
+            aria-label="Visit LinkedIn profile"
           >
             <Linkedin className="w-5 h-5" />
           </a>
@@ -152,7 +155,8 @@ export default function Home() {
             href="mailto:antonioluis.santos1@gmail.com" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="text-gray-600 hover:text-red-500 transition-colors"
+            className="text-gray-700 hover:text-red-500 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded-lg p-1"
+            aria-label="Send email"
           >
             <Mail className="w-5 h-5" />
           </a>

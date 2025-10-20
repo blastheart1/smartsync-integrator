@@ -13,3 +13,78 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model GoogleAccount {
+  id String @id @default(cuid())
+  userId String
+  email String
+  accessToken String
+  refreshToken String
+  expiresAt DateTime
+  scope String
+  avatar String?
+  isActive Boolean @default(false)
+  lastUsed DateTime?
+  createdAt DateTime @default(now())
+  connections GoogleSheetConnection[]
+  syncMappings IntegrationMapping[]
+}
+
+model GoogleSheetConnection {
+  id String @id @default(cuid())
+  accountId String
+  account GoogleAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  spreadsheetId String
+  spreadsheetName String
+  sheetUrl String
+  lastSync DateTime?
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now())
+}
+
+model IntegrationMapping {
+  id String @id @default(cuid())
+  userId String
+  name String
+  sourceType String // "googlesheets"
+  sourceAccountId String
+  sourceAccount GoogleAccount @relation(fields: [sourceAccountId], references: [id], onDelete: Cascade)
+  sourceSpreadsheetId String
+  sourceRange String?
+  targetType String // "quickbooks", "hubspot", etc.
+  targetEntity String // "Invoice", "Contact", etc.
+  fieldMappings Json // Column to field mappings
+  syncFrequency String // "realtime", "hourly", "daily"
+  triggerType String // "new_row", "cell_update", "schedule"
+  isActive Boolean @default(true)
+  lastSync DateTime?
+  syncCount Int @default(0)
+  createdAt DateTime @default(now())
+  syncLogs SyncLog[]
+  syncJobs SyncJob[]
+}
+
+model SyncLog {
+  id String @id @default(cuid())
+  mappingId String
+  mapping IntegrationMapping @relation(fields: [mappingId], references: [id], onDelete: Cascade)
+  status String // "running", "success", "error"
+  startedAt DateTime
+  completedAt DateTime?
+  rowsProcessed Int @default(0)
+  rowsFailed Int @default(0)
+  errorMessage String?
+  errorDetails Json?
+  createdAt DateTime @default(now())
+}
+
+model SyncJob {
+  id String @id @default(cuid())
+  mappingId String
+  mapping IntegrationMapping @relation(fields: [mappingId], references: [id], onDelete: Cascade)
+  scheduledFor DateTime
+  status String // "pending", "running", "completed", "failed"
+  attempts Int @default(0)
+  lastAttempt DateTime?
+  createdAt DateTime @default(now())
+}
