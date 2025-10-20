@@ -1,6 +1,6 @@
 # 🚀 SmartSync Integrator
 
-A modern, enterprise-grade integration platform that seamlessly connects QuickBooks Online and Bill.com with advanced data synchronization, automatic token management, and professional UI/UX.
+A modern, enterprise-grade integration platform that seamlessly connects your favorite business tools with advanced data synchronization, automation workflows, and professional UI/UX.
 
 ![Next.js](https://img.shields.io/badge/Next.js-15.5.6-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
@@ -9,29 +9,29 @@ A modern, enterprise-grade integration platform that seamlessly connects QuickBo
 
 ## ✨ Features
 
-### 🔄 **Advanced Data Synchronization**
-- **Real-time Data Sync**: Live synchronization between QuickBooks Online and Bill.com
-- **Automatic Token Refresh**: Smart token management with automatic renewal
-- **Error Recovery**: Robust error handling with automatic retry mechanisms
-- **Data Validation**: Comprehensive data validation and error reporting
+### 🔄 **Comprehensive Integration Hub**
+- **20+ Integrations**: CRM, ERP, Payment gateways, Communication tools, Cloud services, Marketing platforms, Project management
+- **Bi-directional Sync**: Seamless data flow between connected applications
+- **Automation Workflows**: Visual flow builder for custom integrations
+- **Real-time Monitoring**: Live sync status and activity logs
 
-### 📊 **Professional Data Management**
-- **Advanced Data Tables**: Search, sort, filter, and export functionality
-- **Loading States**: Professional loading skeletons and progress indicators
-- **Toast Notifications**: Real-time success/error feedback system
-- **Responsive Design**: Mobile-first design that works on all devices
-
-### 🔒 **Enterprise Security**
-- **OAuth 2.0 Integration**: Secure authentication with QuickBooks Online
-- **Token Encryption**: Secure token storage and management
-- **Environment Variables**: All sensitive data stored in environment variables
-- **CORS Protection**: Configured cross-origin resource sharing
+### 📊 **Advanced Data Management**
+- **Google Sheets Integration**: Full OAuth, multi-account support, read/write operations
+- **Integration Mapper**: Visual field mapping with drag-and-drop interface
+- **Template System**: Pre-built integrations for common use cases
+- **Sync Engine**: Background job processing with error handling and retry logic
 
 ### 🎨 **Modern UI/UX**
-- **Framer Motion**: Smooth animations and transitions
-- **Tailwind CSS**: Utility-first CSS framework
-- **Lucide Icons**: Beautiful, consistent iconography
-- **Dark/Light Theme**: Adaptive theming support
+- **Component-Based Architecture**: Reusable, maintainable CSS system
+- **Bento Grid Layout**: Beautiful, responsive integration cards
+- **Accessibility Compliant**: WCAG 2.1 AA standards with proper contrast and keyboard navigation
+- **Seamless Scrolling**: Custom scrollbar styling across all components
+
+### 🔒 **Enterprise Security**
+- **OAuth 2.0 Integration**: Secure authentication with multiple providers
+- **Token Management**: Automatic refresh and secure storage
+- **Environment Variables**: All sensitive data stored securely
+- **Multi-account Support**: Manage multiple accounts per integration
 
 ## 🏗️ Architecture
 
@@ -40,15 +40,34 @@ src/
 ├── app/                          # Next.js App Router
 │   ├── api/                      # API Routes
 │   │   ├── auth/                 # NextAuth.js authentication
-│   │   └── integrations/         # Integration endpoints
+│   │   ├── integrations/         # Integration endpoints
+│   │   │   ├── quickbooks/       # QuickBooks integration
+│   │   │   ├── googlesheets/     # Google Sheets integration
+│   │   │   └── billdotcom/       # Bill.com integration
+│   │   └── sync/                 # Sync engine endpoints
 │   ├── integrations/             # Integration pages
-│   │   ├── quickbooks/           # QuickBooks integration
-│   │   └── billcom/              # Bill.com integration
-│   └── globals.css               # Global styles
+│   │   ├── quickbooks/           # QuickBooks dashboard
+│   │   ├── googlesheets/         # Google Sheets dashboard
+│   │   │   └── create/           # Integration mapper
+│   │   └── [provider]/           # Dynamic provider pages
+│   └── globals.css               # Global styles with component classes
 ├── components/                   # Reusable components
+│   ├── integrations/             # Integration-specific components
+│   │   ├── BentoGrid.tsx         # Integration grid layout
+│   │   ├── IntegrationCard.tsx   # Integration cards
+│   │   ├── IntegrationMapper.tsx # Visual integration builder
+│   │   ├── GoogleSheetsBrowser.tsx # Spreadsheet browser
+│   │   └── SyncMonitoring.tsx    # Sync status monitoring
+│   ├── dashboard/                # Dashboard components
 │   └── ui/                       # UI component library
 ├── lib/                          # Utility libraries
 │   ├── integrations/             # Integration logic
+│   │   ├── registry.ts           # Integration capabilities registry
+│   │   ├── googlesheets.ts       # Google Sheets API client
+│   │   └── templates.ts          # Pre-built integration templates
+│   ├── sync/                     # Sync engine
+│   │   ├── engine.ts             # Core sync orchestrator
+│   │   └── scheduler.ts          # Background job scheduler
 │   └── env.ts                    # Environment configuration
 └── middleware.ts                 # Next.js middleware
 ```
@@ -59,6 +78,8 @@ src/
 
 - **Node.js** 18.0 or later
 - **npm** or **yarn**
+- **PostgreSQL** database
+- **Google Cloud Console** account (for Google Sheets)
 - **QuickBooks Online** developer account
 - **Bill.com** developer account
 
@@ -85,6 +106,11 @@ src/
    # Database
    DATABASE_URL="postgresql://username:password@localhost:5432/smartsync_integrator"
    
+   # Google Sheets Integration
+   GOOGLE_CLIENT_ID="your_google_client_id"
+   GOOGLE_CLIENT_SECRET="your_google_client_secret"
+   GOOGLE_REDIRECT_URI="http://localhost:3000/api/integrations/googlesheets/callback"
+   
    # QuickBooks Online
    QUICKBOOKS_CLIENT_ID="your_client_id"
    QUICKBOOKS_CLIENT_SECRET="your_client_secret"
@@ -98,23 +124,41 @@ src/
    # NextAuth.js
    NEXTAUTH_SECRET="your_secret_key"
    NEXTAUTH_URL="http://localhost:3000"
-   
-   # Admin
-   ADMIN_USER="admin"
-   ADMIN_PASS="your_password"
    ```
 
-5. **Start development server**
+5. **Database Setup**
+   ```bash
+   npx prisma db push
+   npx prisma generate
+   ```
+
+6. **Start development server**
    ```bash
    npm run dev
    ```
 
-6. **Open your browser**
+7. **Open your browser**
    ```
    http://localhost:3000
    ```
 
 ## 🔧 Configuration
+
+### Google Sheets Setup
+
+1. **Create Google Cloud Project**
+   - Visit [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project
+   - Enable Google Sheets API and Google Drive API
+
+2. **Configure OAuth 2.0**
+   - Go to Credentials → Create Credentials → OAuth 2.0 Client ID
+   - Set redirect URI: `http://localhost:3000/api/integrations/googlesheets/callback`
+   - Add your email as a test user
+
+3. **Get Credentials**
+   - Copy Client ID and Client Secret
+   - Add to your `.env.local` file
 
 ### QuickBooks Online Setup
 
@@ -124,11 +168,6 @@ src/
    - Configure OAuth 2.0 settings
    - Set redirect URI: `http://localhost:3000/api/auth/callback/quickbooks`
 
-2. **Get Credentials**
-   - Copy Client ID and Client Secret
-   - Generate access and refresh tokens
-   - Note your Company ID (Realm ID)
-
 ### Bill.com Setup
 
 1. **Create Bill.com Account**
@@ -136,100 +175,126 @@ src/
    - Create developer account
    - Generate API key
 
-2. **Configure API Access**
-   - Enable API access in your Bill.com account
-   - Copy your API key
-   - Configure webhook endpoints (optional)
+## 📖 Integration Registry
 
-## 📖 API Documentation
+### Available Integrations
 
-### Authentication Endpoints
+#### **CRM Systems**
+- **HubSpot** - Contact and deal management
+- **Salesforce** - Accounts, contacts, and opportunities
+- **Zoho Desk** - Ticket and help desk management
 
-#### `POST /api/auth/signin`
-Authenticate with the system.
+#### **ERP Systems**
+- **QuickBooks Online** - Financial data and invoicing
+- **NetSuite** - Enterprise resource planning
+- **SAP** - Business process integration
 
-#### `POST /api/auth/signout`
-Sign out from the system.
+#### **Payment Gateways**
+- **Stripe** - Payment processing and subscriptions
+- **PayPal** - Online payment solutions
 
-### Integration Endpoints
+#### **Communication Tools**
+- **Slack** - Team messaging and notifications
+- **Twilio** - SMS and voice communications
+- **Microsoft Teams** - Business communication platform
 
-#### `GET /api/integrations/quickbooks`
-Fetch QuickBooks data with automatic token refresh.
+#### **Cloud Services**
+- **Google Sheets** - Spreadsheet data management
+- **Google Drive** - File storage and sharing
+- **Dropbox** - Cloud file synchronization
 
-**Query Parameters:**
-- `query`: SQL query string (e.g., `select * from Customer`)
+#### **Marketing Platforms**
+- **Mailchimp** - Email marketing campaigns
+- **Klaviyo** - Email and SMS marketing automation
 
-**Response:**
-```json
-{
-  "QueryResponse": {
-    "Customer": [...],
-    "startPosition": 1,
-    "maxResults": 29
-  },
-  "time": "2025-10-17T05:24:52.604-07:00"
-}
-```
-
-#### `GET /api/integrations/billdotcom`
-Fetch Bill.com data.
-
-**Query Parameters:**
-- `endpoint`: API endpoint (vendors, bills, payments)
-
-#### `GET /api/integrations/quickbooks/refresh-token`
-Check token status and manage refresh tokens.
-
-**Methods:**
-- `GET`: Check current token status
-- `POST`: Force token refresh
-- `DELETE`: Clear token cache
+#### **Project Management**
+- **Asana** - Task and project organization
+- **Trello** - Board-based project management
+- **ClickUp** - All-in-one productivity platform
 
 ## 🎯 Usage Examples
 
-### QuickBooks Integration
+### Google Sheets Integration
 
 ```typescript
-// Fetch customers
-const response = await fetch('/api/integrations/quickbooks?query=select * from Customer');
-const data = await response.json();
+// List spreadsheets
+const spreadsheets = await fetch('/api/integrations/googlesheets/spreadsheets');
 
-// Fetch invoices
-const invoices = await fetch('/api/integrations/quickbooks?query=select * from Invoice');
+// Read data from range
+const data = await fetch('/api/integrations/googlesheets/read', {
+  method: 'POST',
+  body: JSON.stringify({
+    spreadsheetId: 'your_sheet_id',
+    range: 'Sheet1!A1:D10'
+  })
+});
 
-// Fetch payments
-const payments = await fetch('/api/integrations/quickbooks?query=select * from Payment');
+// Create integration mapping
+const mapping = await fetch('/api/integrations/googlesheets/mappings', {
+  method: 'POST',
+  body: JSON.stringify({
+    name: 'Customer Sync',
+    sourceSpreadsheetId: 'source_id',
+    targetSpreadsheetId: 'target_id',
+    sourceRange: 'A1:Z',
+    targetRange: 'A1:Z',
+    fieldMappings: [
+      { source: 'Name', target: 'Customer Name' },
+      { source: 'Email', target: 'Email Address' }
+    ]
+  })
+});
 ```
 
-### Bill.com Integration
+### Integration Templates
 
 ```typescript
-// Fetch vendors
-const vendors = await fetch('/api/integrations/billdotcom?endpoint=vendors');
-
-// Fetch bills
-const bills = await fetch('/api/integrations/billdotcom?endpoint=bills');
-
-// Fetch payments
-const payments = await fetch('/api/integrations/billdotcom?endpoint=payments');
+// Available templates
+const templates = [
+  {
+    id: 'quickbooks-to-sheets',
+    name: 'QuickBooks → Google Sheets',
+    description: 'Sync customers and invoices to spreadsheet',
+    source: 'quickbooks',
+    target: 'googlesheets'
+  },
+  {
+    id: 'hubspot-to-sheets',
+    name: 'HubSpot → Google Sheets',
+    description: 'Export contacts and deals to spreadsheet',
+    source: 'hubspot',
+    target: 'googlesheets'
+  }
+];
 ```
 
 ## 🔒 Security Features
 
 ### Token Management
 - **Automatic Refresh**: Tokens are automatically refreshed when they expire
-- **Secure Storage**: Tokens are stored securely in memory with expiration tracking
-- **Error Recovery**: Automatic retry with refreshed tokens on authentication failures
+- **Secure Storage**: Tokens stored in PostgreSQL with encryption
+- **Multi-account Support**: Manage multiple accounts per integration
+- **Error Recovery**: Automatic retry with refreshed tokens
 
 ### Data Protection
-- **Environment Variables**: All sensitive data stored in environment variables
-- **No Hardcoded Secrets**: Comprehensive security audit ensures no hardcoded credentials
-- **CORS Configuration**: Proper cross-origin resource sharing setup
+- **Environment Variables**: All sensitive data stored securely
+- **OAuth 2.0**: Industry-standard authentication
+- **Database Encryption**: Secure data storage with Prisma
+- **CORS Configuration**: Proper cross-origin resource sharing
 
-### Authentication
-- **OAuth 2.0**: Industry-standard authentication with QuickBooks Online
-- **NextAuth.js**: Secure session management
-- **Admin Authentication**: Protected admin routes
+## 🎨 Design System
+
+### Component Architecture
+- **Reusable Components**: Button, card, badge, modal, tab components
+- **Design Tokens**: Centralized colors, spacing, and typography
+- **Accessibility**: WCAG 2.1 AA compliant with proper contrast ratios
+- **Responsive Design**: Mobile-first approach with Tailwind CSS
+
+### CSS Architecture
+- **Zero Inline Styles**: All styling through Tailwind classes and component classes
+- **Semantic Classes**: `.btn-primary`, `.card`, `.badge-status` for maintainability
+- **Design Tokens**: Brand colors, text colors, and spacing defined in config
+- **Component Layer**: Reusable UI patterns in `@layer components`
 
 ## 🧪 Testing
 
@@ -248,6 +313,18 @@ npm run lint
 npm run type-check
 ```
 
+### Database Operations
+```bash
+# Push schema changes
+npx prisma db push
+
+# Generate Prisma client
+npx prisma generate
+
+# View database in Prisma Studio
+npx prisma studio
+```
+
 ## 📦 Deployment
 
 ### Vercel (Recommended)
@@ -260,6 +337,12 @@ npm run type-check
 2. **Configure Environment Variables**
    - Add all environment variables in Vercel dashboard
    - Ensure `NEXTAUTH_URL` points to your domain
+   - Set up PostgreSQL database (Vercel Postgres recommended)
+
+3. **Database Setup**
+   ```bash
+   npx prisma db push
+   ```
 
 ### Docker
 
@@ -271,18 +354,6 @@ npm run type-check
 2. **Run Container**
    ```bash
    docker run -p 3000:3000 --env-file .env.local smartsync-integrator
-   ```
-
-### Manual Deployment
-
-1. **Build Application**
-   ```bash
-   npm run build
-   ```
-
-2. **Start Production Server**
-   ```bash
-   npm start
    ```
 
 ## 🤝 Contributing
@@ -308,43 +379,45 @@ We welcome contributions! Please follow these steps:
 
 - **Code Style**: Follow ESLint and Prettier configurations
 - **TypeScript**: Use strict typing
+- **Component Classes**: Use the design system components
+- **Accessibility**: Ensure WCAG 2.1 AA compliance
 - **Testing**: Write tests for new features
 - **Documentation**: Update README for new features
 
 ## 📋 Roadmap
 
-### Phase 1 (Current)
-- ✅ QuickBooks Online integration
-- ✅ Bill.com integration
-- ✅ Automatic token refresh
-- ✅ Professional UI/UX
-- ✅ Data export functionality
+### Phase 1 (Completed ✅)
+- ✅ Integration registry with 20+ providers
+- ✅ Google Sheets full integration with OAuth
+- ✅ Integration mapper with visual field mapping
+- ✅ Sync engine with background job processing
+- ✅ Component-based CSS architecture
+- ✅ Accessibility improvements (WCAG 2.1 AA)
 
-### Phase 2 (Planned)
-- 🔄 Real-time WebSocket connections
-- 📊 Advanced data visualization
-- 🔍 Enhanced search and filtering
-- 📱 Mobile application
-- 🔐 Multi-tenant support
+### Phase 2 (In Progress 🔄)
+- 🔄 HubSpot OAuth and contacts sync
+- 🔄 Slack messaging integration
+- 🔄 Salesforce SOQL queries
+- 🔄 Advanced monitoring dashboard
+- 🔄 Webhook support for real-time updates
 
-### Phase 3 (Future)
-- 🤖 AI-powered insights
-- 📈 Business intelligence dashboard
-- 🔗 Additional integrations (Xero, Sage, etc.)
-- 🌐 Multi-language support
-- 📊 Advanced analytics
+### Phase 3 (Planned 📋)
+- 📋 AI-powered field mapping suggestions
+- 📋 Advanced data transformation rules
+- 📋 Multi-tenant support
+- 📋 Mobile application
+- 📋 Additional integrations (Xero, Sage, etc.)
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-#### Token Refresh Failures
+#### Google Sheets OAuth Issues
 ```bash
-# Check environment variables
-npm run env:check
-
-# Clear token cache
-curl -X DELETE http://localhost:3000/api/integrations/quickbooks/refresh-token
+# Check Google Cloud Console settings
+# Ensure APIs are enabled: Google Sheets API, Google Drive API
+# Verify redirect URI matches exactly
+# Add your email as a test user in OAuth consent screen
 ```
 
 #### Database Connection Issues
@@ -352,8 +425,8 @@ curl -X DELETE http://localhost:3000/api/integrations/quickbooks/refresh-token
 # Check database URL
 echo $DATABASE_URL
 
-# Test connection
-npm run db:test
+# Reset database
+npx prisma db push --force-reset
 ```
 
 #### Build Failures
@@ -373,11 +446,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **QuickBooks Online API** - For providing robust integration capabilities
-- **Bill.com API** - For comprehensive financial data access
+- **Google APIs** - For comprehensive integration capabilities
+- **QuickBooks Online API** - For financial data access
+- **Bill.com API** - For payment processing
 - **Next.js Team** - For the amazing framework
 - **Tailwind CSS** - For the utility-first CSS framework
-- **Framer Motion** - For smooth animations
+- **Prisma** - For excellent database tooling
 
 ## 📞 Support
 
@@ -395,4 +469,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Made with ❤️ by [blastheart1](https://github.com/blastheart1)**
 
-*SmartSync Integrator - Streamlining your financial data integration workflow*
+*SmartSync Integrator - Streamlining your business integration workflow*

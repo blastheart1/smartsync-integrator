@@ -76,10 +76,10 @@ export default function IntegrationCard({ provider, onUse }: Props) {
     >
       <motion.div
         whileHover={{ y: -2 }}
-        className={`rounded-xl border shadow-sm p-5 h-[200px] flex flex-col transition-colors ${
+        className={`integration-card ${
           provider.status === "coming_soon" 
-            ? "border-gray-200 bg-gray-50" 
-            : "border-gray-200 bg-white hover:border-gray-300"
+            ? "integration-card-coming-soon" 
+            : "integration-card-active"
         }`}
       >
         <div className="flex items-center justify-between mb-3 h-12">
@@ -91,8 +91,7 @@ export default function IntegrationCard({ provider, onUse }: Props) {
             </div>
           </div>
           <span
-            className="text-[11px] uppercase font-semibold px-2 py-1 rounded flex-shrink-0 ml-2"
-            style={{ background: "#E5E7EB", color: "#1F2937" }}
+            className="badge-status flex-shrink-0 ml-2"
             role="status"
             aria-label={`Integration status: ${statusLabel}`}
           >
@@ -106,7 +105,7 @@ export default function IntegrationCard({ provider, onUse }: Props) {
           {/* Badges - always show exactly 3, truncate if more */}
           <div className="flex items-center gap-2 mb-3 h-6">
             {provider.capability.entities.slice(0, 3).map((e) => (
-              <span key={e} className="text-[11px] bg-gray-200 text-gray-800 px-2 py-0.5 rounded-full truncate max-w-[80px]">
+              <span key={e} className="badge badge-gray truncate max-w-[80px]">
                 {e}
               </span>
             ))}

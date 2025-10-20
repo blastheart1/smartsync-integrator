@@ -109,7 +109,24 @@ export async function getSpreadsheetInfo(spreadsheetId: string, userId: string):
     throw new Error(`Failed to get spreadsheet info: ${error}`);
   }
   
-  return await response.json();
+  const data = await response.json();
+  console.log('📋 Raw spreadsheet data:', data);
+  
+  // Parse the sheets properly
+  const sheets = data.sheets?.map((sheet: any) => ({
+    id: sheet.properties.sheetId,
+    name: sheet.properties.title,
+    rowCount: sheet.properties.gridProperties?.rowCount,
+    columnCount: sheet.properties.gridProperties?.columnCount
+  })) || [];
+  
+  console.log('📋 Parsed sheets:', sheets);
+  
+  return {
+    spreadsheetId: data.spreadsheetId,
+    title: data.properties?.title || 'Untitled',
+    sheets: sheets
+  };
 }
 
 /**
@@ -117,41 +134,127 @@ export async function getSpreadsheetInfo(spreadsheetId: string, userId: string):
  */
 export async function readRange(spreadsheetId: string, range: string, userId: string): Promise<RangeData> {
   console.log('📖 Reading range:', range, 'from spreadsheet:', spreadsheetId);
+  console.log('📖 User ID:', userId);
   
-  const accessToken = await getValidAccessToken(userId);
-  
-  // Handle range encoding properly for Google Sheets API
-  let apiRange = range;
-  if (range.includes('!')) {
-    // Range includes sheet name, encode sheet name but keep the ! and cell range
-    const [sheetName, cellRange] = range.split('!');
-    apiRange = `${encodeURIComponent(sheetName)}!${cellRange}`;
-  } else {
-    // Just a cell range, encode it
-    apiRange = encodeURIComponent(range);
+  try {
+    const accessToken = await getValidAccessToken(userId);
+    console.log('📖 Access token obtained successfully, length:', accessToken.length);
+    
+    // Validate inputs
+    if (!spreadsheetId || typeof spreadsheetId !== 'string') {
+      throw new Error('Spreadsheet ID must be a non-empty string');
+    }
+    
+    if (!range || typeof range !== 'string') {
+      throw new Error('Range must be a non-empty string');
+    }
+    
+    // First, let's get the spreadsheet info to see what sheets exist
+    console.log('📖 Getting spreadsheet info to check available sheets...');
+    const spreadsheetInfo = await getSpreadsheetInfo(spreadsheetId, userId);
+    console.log('📖 Available sheets:', spreadsheetInfo.sheets.map(s => s.name));
+    
+    // Check if we have any sheets
+    if (!spreadsheetInfo.sheets || spreadsheetInfo.sheets.length === 0) {
+      throw new Error('No sheets found in the spreadsheet');
+    }
+    
+    // Validate and potentially fix range format
+    console.log('📖 Original range:', range);
+    
+    // Try to normalize the range format
+    let normalizedRange = range.trim();
+    
+    // If range includes sheet name, check if it exists
+    if (normalizedRange.includes('!')) {
+      const [sheetName, cellRange] = normalizedRange.split('!');
+      const sheetExists = spreadsheetInfo.sheets.some(s => s.name === sheetName);
+      if (!sheetExists) {
+        console.warn(`📖 Sheet "${sheetName}" not found. Available sheets:`, spreadsheetInfo.sheets.map(s => s.name));
+        // Use the first available sheet instead
+        const firstSheet = spreadsheetInfo.sheets[0];
+        normalizedRange = `${firstSheet.name}!${cellRange}`;
+        console.log('📖 Using first available sheet:', normalizedRange);
+      }
+    } else {
+      // If no sheet name, use the first available sheet
+      const firstSheet = spreadsheetInfo.sheets[0];
+      normalizedRange = `${firstSheet.name}!${normalizedRange}`;
+      console.log('📖 Added first sheet name:', normalizedRange);
+    }
+    
+    // Use batchGet endpoint which handles ranges better
+    const apiUrl = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchGet`;
+    
+    console.log('📖 Using batchGet endpoint');
+    console.log('📖 API URL:', apiUrl);
+    console.log('📖 Normalized range:', normalizedRange);
+    
+    const finalUrl = `${apiUrl}?ranges=${encodeURIComponent(normalizedRange)}`;
+    console.log('📖 Final URL with range parameter:', finalUrl);
+    
+    const response = await fetch(finalUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Accept': 'application/json',
+      },
+    });
+    
+    console.log('📖 Response status:', response.status);
+    console.log('📖 Response headers:', Object.fromEntries(response.headers.entries()));
+    
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('📖 Failed to read range');
+      console.error('📖 Original range:', range);
+      console.error('📖 Spreadsheet ID:', spreadsheetId);
+      console.error('📖 Response status:', response.status);
+      console.error('📖 Response status text:', response.statusText);
+      console.error('📖 Error response:', error);
+      
+      // Try to parse the error for more specific information
+      try {
+        const errorData = JSON.parse(error);
+        console.error('📖 Parsed error data:', errorData);
+        if (errorData.error && errorData.error.message) {
+          throw new Error(`Failed to read range "${range}": ${errorData.error.message}`);
+        }
+      } catch (parseError) {
+        console.error('📖 Failed to parse error response:', parseError);
+        // If parsing fails, use the original error
+      }
+      
+      throw new Error(`Failed to read range: ${error}`);
+    }
+    
+    const data = await response.json();
+    console.log('📖 Successfully received data from Google Sheets API');
+    console.log('📖 BatchGet response:', data);
+    
+    // batchGet returns data in a different format
+    if (data.valueRanges && data.valueRanges.length > 0) {
+      const valueRange = data.valueRanges[0];
+      console.log('📖 Value range:', valueRange);
+      
+      return {
+        range: valueRange.range,
+        values: valueRange.values || []
+      };
+    } else {
+      // Fallback to empty data
+      return {
+        range: range,
+        values: []
+      };
+    }
+  } catch (error) {
+    console.error('📖 Error in readRange function:', error);
+    console.error('📖 Error name:', error instanceof Error ? error.name : 'Unknown');
+    console.error('📖 Error message:', error instanceof Error ? error.message : 'Unknown error');
+    console.error('📖 Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    throw error;
   }
-  
-  console.log('📖 Using API range:', apiRange);
-  
-  const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${apiRange}`, {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-    },
-  });
-  
-  if (!response.ok) {
-    const error = await response.text();
-    console.error('📖 Failed to read range. API range used:', apiRange);
-    console.error('📖 Error response:', error);
-    throw new Error(`Failed to read range: ${error}`);
-  }
-  
-  const data = await response.json();
-  
-  return {
-    range: data.range,
-    values: data.values || []
-  };
 }
 
 /**

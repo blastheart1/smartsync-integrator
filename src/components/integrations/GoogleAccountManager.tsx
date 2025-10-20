@@ -40,8 +40,8 @@ export default function GoogleAccountManager({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="modal-overlay">
+      <div className="modal-content">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <h2 className="text-xl font-semibold text-gray-900">Manage Google Accounts</h2>
@@ -65,7 +65,7 @@ export default function GoogleAccountManager({
               <p className="text-gray-500 mb-6">Connect a Google account to start syncing your spreadsheets</p>
               <button
                 onClick={onConnectAccount}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2 mx-auto"
+                className="btn btn-primary btn-lg mx-auto"
               >
                 <Plus className="w-4 h-4" />
                 Connect Google Account
@@ -122,7 +122,7 @@ export default function GoogleAccountManager({
               <div className="pt-4 border-t border-gray-100">
                 <button
                   onClick={onConnectAccount}
-                  className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="btn btn-primary btn-lg w-full"
                 >
                   <Plus className="w-4 h-4" />
                   Add Another Account

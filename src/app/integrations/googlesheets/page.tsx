@@ -341,7 +341,7 @@ function GoogleSheetsPageContent() {
             {accounts.length > 0 ? (
               <button
                 onClick={() => setShowAccountManager(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                className="btn btn-primary btn-md"
               >
                 {(() => {
                   const activeAccount = accounts.find(acc => acc.isActive);
@@ -367,7 +367,7 @@ function GoogleSheetsPageContent() {
             ) : (
               <button
                 onClick={handleConnectAccount}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                className="btn btn-primary btn-md"
               >
                 <Plus className="w-4 h-4" />
                 Connect Google Account
@@ -385,11 +385,7 @@ function GoogleSheetsPageContent() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 py-4 px-6 border-b-2 font-medium text-sm text-center transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                  activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600 bg-blue-50/50'
-                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 hover:bg-gray-50/50'
-                }`}
+                className={`tab ${activeTab === tab.id ? 'tab-active' : 'tab-inactive'}`}
               >
                 {tab.label}
               </button>
@@ -589,7 +585,7 @@ function GoogleSheetsPageContent() {
                   </div>
                   <button 
                     onClick={() => router.push('/integrations/googlesheets/create')}
-                    className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 flex items-center gap-2 font-medium mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="btn btn-primary btn-lg mb-6"
                   >
                     <Plus className="w-4 h-4" />
                     Create Integration

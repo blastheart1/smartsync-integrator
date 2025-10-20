@@ -26,9 +26,10 @@ export default function GoogleSheetsOperations({
   // Read tab state
   const [readLoading, setReadLoading] = useState(false);
   const [readData, setReadData] = useState<string[][]>([]);
-  const [readRange, setReadRange] = useState('Sheet1!A1:D10');
+  const [readRange, setReadRange] = useState('');
   const [readError, setReadError] = useState<string | null>(null);
   const [readSpreadsheetId, setReadSpreadsheetId] = useState(selectedSpreadsheet?.id || '');
+  const [useCustomRange, setUseCustomRange] = useState(false);
   
   // Write tab state
   const [writeLoading, setWriteLoading] = useState(false);
@@ -40,8 +41,8 @@ export default function GoogleSheetsOperations({
   const [writeHeaders, setWriteHeaders] = useState(['Column A', 'Column B', 'Column C', 'Column D']);
 
   const handleReadData = async () => {
-    if (!readSpreadsheetId || !readRange) {
-      setReadError('Please select a spreadsheet and enter a range');
+    if (!readSpreadsheetId) {
+      setReadError('Please select a spreadsheet');
       return;
     }
 
@@ -49,14 +50,32 @@ export default function GoogleSheetsOperations({
     setReadError(null);
     
     try {
+      // Determine range to use
+      let rangeToUse;
+      if (useCustomRange && readRange) {
+        rangeToUse = readRange;
+        console.log('📊 Using custom range:', rangeToUse);
+      } else {
+        console.log('📊 Auto-detecting data range...');
+        rangeToUse = 'A1:Z1000'; // Use a large range to detect actual data
+      }
+      
       const response = await fetch(
-        `/api/integrations/googlesheets/read?spreadsheetId=${readSpreadsheetId}&range=${encodeURIComponent(readRange)}`
+        `/api/integrations/googlesheets/read?spreadsheetId=${readSpreadsheetId}&range=${encodeURIComponent(rangeToUse)}`
       );
       
       const result = await response.json();
       
       if (result.success) {
-        setReadData(result.data.values || []);
+        const data = result.data.values || [];
+        setReadData(data);
+        
+        // Auto-detect and suggest the optimal range (only if not using custom range)
+        if (!useCustomRange && data.length > 0) {
+          const detectedRange = detectDataRange(data);
+          setReadRange(detectedRange);
+          console.log('📊 Auto-detected range:', detectedRange);
+        }
       } else {
         setReadError(result.error || 'Failed to read data');
       }
@@ -65,6 +84,44 @@ export default function GoogleSheetsOperations({
     } finally {
       setReadLoading(false);
     }
+  };
+
+  // Helper function to convert column number to letter (A, B, C, ..., Z, AA, AB, etc.)
+  const convertToColumnLetter = (columnNumber: number): string => {
+    let result = '';
+    while (columnNumber > 0) {
+      columnNumber--;
+      result = String.fromCharCode(65 + (columnNumber % 26)) + result;
+      columnNumber = Math.floor(columnNumber / 26);
+    }
+    return result;
+  };
+
+  // Helper function to detect the actual data range
+  const detectDataRange = (data: string[][]) => {
+    if (!data || data.length === 0) return 'A1:A1';
+    
+    // Find the last row with data
+    let lastRow = 0;
+    let lastCol = 0;
+    
+    for (let i = 0; i < data.length; i++) {
+      const row = data[i];
+      if (row && row.some(cell => cell && cell.trim() !== '')) {
+        lastRow = i + 1;
+        for (let j = 0; j < row.length; j++) {
+          if (row[j] && row[j].trim() !== '') {
+            lastCol = Math.max(lastCol, j + 1);
+          }
+        }
+      }
+    }
+    
+    if (lastRow === 0 || lastCol === 0) return 'A1:A1';
+    
+    // Convert column number to letter (handle columns beyond Z)
+    const colLetter = convertToColumnLetter(lastCol);
+    return `A1:${colLetter}${lastRow}`;
   };
 
   const handleWriteData = async () => {
@@ -188,33 +245,69 @@ export default function GoogleSheetsOperations({
                 </select>
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Range (e.g., Sheet1!A1:D10)
-                </label>
-                <input
-                  type="text"
-                  value={readRange}
-                  onChange={(e) => setReadRange(e.target.value)}
-                  placeholder="Sheet1!A1:D10"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
+              <div className="flex flex-col justify-end">
+                <button
+                  onClick={handleReadData}
+                  disabled={readLoading || !readSpreadsheetId || (useCustomRange && !readRange)}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                >
+                  {readLoading ? 'Reading...' : useCustomRange ? 'Read Data' : 'Auto-Detect & Read Data'}
+                </button>
               </div>
             </div>
-            
-            <button
-              onClick={handleReadData}
-              disabled={readLoading || !readSpreadsheetId || !readRange}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-            >
-              {readLoading ? 'Reading...' : 'Read Data'}
-            </button>
+
+            {/* Custom Range Option */}
+            <div className="mt-4">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={useCustomRange}
+                  onChange={(e) => setUseCustomRange(e.target.checked)}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  Specify custom range
+                </span>
+              </label>
+              
+              {useCustomRange && (
+                <div className="mt-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Range (e.g., Sheet1!A1:D10, Data!A:Z)
+                  </label>
+                  <input
+                    type="text"
+                    value={readRange}
+                    onChange={(e) => setReadRange(e.target.value)}
+                    placeholder="Enter range like Sheet1!A1:D10 or just A1:D10"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    💡 Specify a custom range to read specific data from your spreadsheet
+                  </p>
+                </div>
+              )}
+              
+              {!useCustomRange && (
+                <p className="text-xs text-blue-600 mt-2">
+                  🚀 Auto-detect will automatically find and read all data in the selected spreadsheet
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Results */}
           {readError && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-red-800 text-sm">{readError}</p>
+            </div>
+          )}
+
+          {readRange && (
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-green-700 text-sm">
+                📊 Reading range: <span className="font-mono font-medium">{readRange}</span>
+              </p>
             </div>
           )}
 
