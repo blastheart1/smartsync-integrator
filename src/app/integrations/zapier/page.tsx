@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Zap, Settings, Play, Copy, ExternalLink, Home, Plus, Trash2, TestTube } from "lucide-react";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useToast } from "@/components/ui/Toast";
@@ -204,8 +205,10 @@ export default function ZapierPage() {
           className="mb-8"
         >
           <div className="flex items-center justify-between mb-4">
-            <div></div>
-            <h1 className="text-3xl font-bold text-gray-900">Zapier Integration</h1>
+            <div className="flex items-center">
+              <Image src="/zapier.png" alt="Zapier" width={32} height={32} className="mr-4" />
+              <h1 className="text-3xl font-bold text-gray-900">Zapier Integration</h1>
+            </div>
             <Link 
               href="/" 
               className="flex items-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors"

@@ -14,8 +14,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SmartSync Integrator - Integration Management Hub",
+  title: "SmartSync",
   description: "A secure workspace to manage automations and API connections between QuickBooks, Bill.com, Zapier, and internal systems.",
+  icons: {
+    icon: "/smartsync.ico",
+  },
 };
 
 export default function RootLayout({

@@ -1,7 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FileCode2, Database, Zap, Settings, TestTube, CheckCircle, AlertCircle, Terminal, Play, Square, Home, Info } from "lucide-react";
+import { FileCode2, Zap, Settings, TestTube, CheckCircle, AlertCircle, Terminal, Play, Square, Home, Info } from "lucide-react";
+import Image from "next/image";
+import BillComIcon from "@/components/icons/BillComIcon";
 import { useState } from "react";
 import Link from "next/link";
 
@@ -25,7 +27,7 @@ export default function IntegrationsPage() {
     {
       name: "Bill.com",
       description: "Automate payable workflows and vendor management",
-      icon: Database,
+      icon: BillComIcon,
       status: "in_progress",
       lastSync: "Coming soon",
       apiEndpoint: "/api/integrations/billdotcom",
@@ -205,12 +207,18 @@ export default function IntegrationsPage() {
                 }`}
               >
                 <div className="flex items-center mb-4">
-                  <div className={`p-2 rounded-lg mr-3 ${
-                    integration.isEnabled ? 'bg-blue-100' : 'bg-gray-100'
-                  }`}>
-                    <Icon className={`w-6 h-6 ${
-                      integration.isEnabled ? 'text-blue-600' : 'text-gray-400'
-                    }`} />
+                  <div className="mr-3 grid place-items-center">
+                    {integration.name === "Bill.com" ? (
+                      <Image src="/billcom.png" alt="Bill.com" width={32} height={32} />
+                    ) : integration.name === "QuickBooks Online" ? (
+                      <Image src="/quickbooks.png" alt="QuickBooks" width={32} height={32} />
+                    ) : integration.name === "Zapier" ? (
+                      <Image src="/zapier.png" alt="Zapier" width={32} height={32} />
+                    ) : (
+                      <Icon className={`w-6 h-6 ${
+                        integration.isEnabled ? 'text-blue-600' : 'text-gray-400'
+                      }`} />
+                    )}
                   </div>
                   <div>
                     <h3 className={`text-lg font-semibold ${

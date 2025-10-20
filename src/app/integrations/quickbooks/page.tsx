@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { FileCode2, Users, DollarSign, TrendingUp, RefreshCw, Download, Eye, AlertCircle, Home, BarChart3, Table } from "lucide-react";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import DataTable from "@/components/ui/DataTable";
@@ -179,9 +180,7 @@ export default function QuickBooksPage() {
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-            <div className="p-3 bg-blue-100 rounded-lg mr-4">
-              <FileCode2 className="w-8 h-8 text-blue-600" />
-            </div>
+              <Image src="/quickbooks.png" alt="QuickBooks" width={32} height={32} className="mr-4" />
             <div>
               <h1 className="text-3xl font-bold text-gray-900">QuickBooks Online Integration</h1>
               <p className="text-gray-600">Sync and manage your QuickBooks data</p>

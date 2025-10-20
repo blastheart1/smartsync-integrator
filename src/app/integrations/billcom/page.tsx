@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Database, Building2, CreditCard, FileText, RefreshCw, Download, Eye, TrendingUp, AlertCircle, Home } from "lucide-react";
+import { Building2, CreditCard, FileText, RefreshCw, Download, Eye, TrendingUp, AlertCircle, Home } from "lucide-react";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import DataTable from "@/components/ui/DataTable";
@@ -205,9 +206,7 @@ export default function BillComPage() {
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <div className="p-3 bg-green-100 rounded-lg mr-4">
-                <Database className="w-8 h-8 text-green-600" />
-              </div>
+              <Image src="/billcom.png" alt="Bill.com" width={32} height={32} className="mr-4" />
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">Bill.com Integration</h1>
                 <p className="text-gray-600">Manage vendors, bills, and payments with Bill.com</p>

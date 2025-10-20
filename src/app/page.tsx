@@ -1,7 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShieldCheck, Zap, FileCode2, Database, Facebook, Instagram, Linkedin, Twitter, Mail } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
+import Image from "next/image";
+import { SiQuickbooks, SiZapier, SiFacebook, SiInstagram, SiLinkedin } from "react-icons/si";
+import { MdOutlineMail } from "react-icons/md";
+import BillComIcon from "@/components/icons/BillComIcon";
 
 export default function Home() {
   const techStacks = [
@@ -21,7 +25,7 @@ export default function Home() {
       name: "QuickBooks Integration",
       description:
         "Sync invoices, bills, and payments securely between QuickBooks Online and internal systems using OAuth 2.0.",
-      icon: FileCode2,
+      icon: SiQuickbooks,
       isEnabled: true,
       status: "available"
     },
@@ -29,7 +33,7 @@ export default function Home() {
       name: "Bill.com Automation",
       description:
         "Automate payable workflows using Spend and Expense APIs with secure token management.",
-      icon: Database,
+      icon: BillComIcon,
       isEnabled: false,
       status: "coming_soon"
     },
@@ -37,7 +41,7 @@ export default function Home() {
       name: "Zapier Workflows",
       description:
         "Connect CRMs, finance tools, and analytics pipelines with automated triggers and actions.",
-      icon: Zap,
+      icon: SiZapier,
       isEnabled: true,
       status: "available"
     },
@@ -99,13 +103,19 @@ export default function Home() {
               }`}
               onClick={feature.isEnabled ? () => window.location.href = getLink(feature.name) : undefined}
             >
-              <div className={`flex items-center justify-center w-10 h-10 rounded-md mb-4 transition-colors ${
-                feature.isEnabled 
-                  ? 'bg-gray-200 text-gray-700 group-hover:bg-blue-100 group-hover:text-blue-600' 
-                  : 'bg-gray-100 text-gray-400'
-              }`}>
-                <Icon className="w-5 h-5" />
-              </div>
+              {feature.name === "Bill.com Automation" ? (
+                <Image src="/billcom.png" alt="Bill.com" width={28} height={28} className="mb-4" />
+              ) : feature.name === "QuickBooks Integration" ? (
+                <Image src="/quickbooks.png" alt="QuickBooks" width={28} height={28} className="mb-4" />
+              ) : feature.name === "Zapier Workflows" ? (
+                <Image src="/zapier.png" alt="Zapier" width={28} height={28} className="mb-4" />
+              ) : (
+                <Icon className={`w-6 h-6 mb-4 ${
+                  feature.isEnabled 
+                    ? 'text-gray-700 group-hover:text-blue-600' 
+                    : 'text-gray-400'
+                }`} />
+              )}
               <h3 className={`text-base font-medium mb-2 ${
                 feature.isEnabled ? 'text-gray-900' : 'text-gray-500'
               }`}>
@@ -180,7 +190,7 @@ export default function Home() {
             rel="noopener noreferrer"
             className="text-gray-600 hover:text-blue-600 transition-colors"
           >
-            <Facebook className="w-5 h-5" />
+            <SiFacebook className="w-5 h-5" />
           </a>
           <a 
             href="https://www.instagram.com/0xlv1s_/" 
@@ -188,7 +198,7 @@ export default function Home() {
             rel="noopener noreferrer"
             className="text-gray-600 hover:text-pink-500 transition-colors"
           >
-            <Instagram className="w-5 h-5" />
+            <SiInstagram className="w-5 h-5" />
           </a>
           <a 
             href="https://www.linkedin.com/in/alasantos01/" 
@@ -196,7 +206,7 @@ export default function Home() {
             rel="noopener noreferrer"
             className="text-gray-600 hover:text-blue-600 transition-colors"
           >
-            <Linkedin className="w-5 h-5" />
+            <SiLinkedin className="w-5 h-5" />
           </a>
           <a 
             href="mailto:antonioluis.santos1@gmail.com" 
@@ -204,7 +214,7 @@ export default function Home() {
             rel="noopener noreferrer"
             className="text-gray-600 hover:text-red-500 transition-colors"
           >
-            <Mail className="w-5 h-5" />
+            <MdOutlineMail className="w-5 h-5" />
           </a>
         </motion.div>
 
