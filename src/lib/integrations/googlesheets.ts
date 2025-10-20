@@ -20,6 +20,13 @@ interface SheetInfo {
   };
 }
 
+interface ParsedSheetInfo {
+  id: number;
+  name: string;
+  rowCount: number;
+  columnCount: number;
+}
+
 interface SpreadsheetMetadata {
   spreadsheetId: string;
   properties: {
@@ -27,7 +34,7 @@ interface SpreadsheetMetadata {
     locale: string;
     timeZone: string;
   };
-  sheets: SheetInfo[];
+  sheets: ParsedSheetInfo[];
 }
 
 interface RangeData {
@@ -124,7 +131,11 @@ export async function getSpreadsheetInfo(spreadsheetId: string, userId: string):
   
   return {
     spreadsheetId: data.spreadsheetId,
-    title: data.properties?.title || 'Untitled',
+    properties: {
+      title: data.properties?.title || 'Untitled',
+      locale: data.properties?.locale || 'en_US',
+      timeZone: data.properties?.timeZone || 'America/New_York'
+    },
     sheets: sheets
   };
 }
