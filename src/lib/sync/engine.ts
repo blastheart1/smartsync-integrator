@@ -1,5 +1,5 @@
 import { PrismaClient } from "@/generated/prisma";
-import { GoogleSheetsClient } from "@/lib/integrations/googlesheets";
+import { readRange } from "@/lib/integrations/googlesheets";
 
 const prisma = new PrismaClient();
 
@@ -19,10 +19,8 @@ export interface SyncContext {
 }
 
 export class SyncEngine {
-  private googleSheetsClient: GoogleSheetsClient;
-
   constructor() {
-    this.googleSheetsClient = new GoogleSheetsClient();
+    // No initialization needed for function-based approach
   }
 
   /**
@@ -130,24 +128,22 @@ export class SyncEngine {
    * Fetch data from source (Google Sheets)
    */
   private async fetchSourceData(context: SyncContext): Promise<any[]> {
-    const { mapping, sourceAccount } = context;
+    const { mapping } = context;
     
-    // Set the active account for the Google Sheets client
-    await this.googleSheetsClient.setActiveAccount(sourceAccount);
-    
-    // Fetch data from the specified range
-    const data = await this.googleSheetsClient.readData(
+    // Fetch data from the specified range using the readRange function
+    const rangeData = await readRange(
       mapping.sourceSpreadsheetId,
-      mapping.sourceRange || "A:Z"
+      mapping.sourceRange || "A:Z",
+      context.userId
     );
     
-    if (!data || data.length === 0) {
+    if (!rangeData.values || rangeData.values.length === 0) {
       throw new Error("No data found in source spreadsheet");
     }
     
     // Use first row as headers
-    const headers = data[0];
-    const rows = data.slice(1);
+    const headers = rangeData.values[0];
+    const rows = rangeData.values.slice(1);
     
     // Convert to objects with headers as keys
     return rows.map((row: any[]) => {
