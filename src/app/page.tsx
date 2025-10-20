@@ -1,10 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, Facebook, Instagram, Linkedin, Mail } from "lucide-react";
 import Image from "next/image";
-import { SiQuickbooks, SiZapier, SiFacebook, SiInstagram, SiLinkedin } from "react-icons/si";
-import { MdOutlineMail } from "react-icons/md";
 import BillComIcon from "@/components/icons/BillComIcon";
 
 export default function Home() {
@@ -25,7 +23,7 @@ export default function Home() {
       name: "QuickBooks Integration",
       description:
         "Sync invoices, bills, and payments securely between QuickBooks Online and internal systems using OAuth 2.0.",
-      icon: SiQuickbooks,
+      icon: ShieldCheck,
       isEnabled: true,
       status: "available"
     },
@@ -41,7 +39,7 @@ export default function Home() {
       name: "Zapier Workflows",
       description:
         "Connect CRMs, finance tools, and analytics pipelines with automated triggers and actions.",
-      icon: SiZapier,
+      icon: ShieldCheck,
       isEnabled: true,
       status: "available"
     },
@@ -190,7 +188,7 @@ export default function Home() {
             rel="noopener noreferrer"
             className="text-gray-600 hover:text-blue-600 transition-colors"
           >
-            <SiFacebook className="w-5 h-5" />
+            <Facebook className="w-5 h-5" />
           </a>
           <a 
             href="https://www.instagram.com/0xlv1s_/" 
@@ -198,7 +196,7 @@ export default function Home() {
             rel="noopener noreferrer"
             className="text-gray-600 hover:text-pink-500 transition-colors"
           >
-            <SiInstagram className="w-5 h-5" />
+            <Instagram className="w-5 h-5" />
           </a>
           <a 
             href="https://www.linkedin.com/in/alasantos01/" 
@@ -206,7 +204,7 @@ export default function Home() {
             rel="noopener noreferrer"
             className="text-gray-600 hover:text-blue-600 transition-colors"
           >
-            <SiLinkedin className="w-5 h-5" />
+            <Linkedin className="w-5 h-5" />
           </a>
           <a 
             href="mailto:antonioluis.santos1@gmail.com" 
@@ -214,7 +212,7 @@ export default function Home() {
             rel="noopener noreferrer"
             className="text-gray-600 hover:text-red-500 transition-colors"
           >
-            <MdOutlineMail className="w-5 h-5" />
+            <Mail className="w-5 h-5" />
           </a>
         </motion.div>
 
