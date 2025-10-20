@@ -70,70 +70,12 @@ export default function Home() {
         </p>
       </motion.div>
 
-      <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl w-full px-4">
-        {features.map((feature, index) => {
-          const Icon = feature.icon;
-          const getLink = (name: string) => {
-            switch (name) {
-              case "QuickBooks Integration":
-                return "/integrations/quickbooks";
-              case "Bill.com Automation":
-                return "/integrations/billcom";
-              case "Zapier Workflows":
-                return "/integrations/zapier";
-              case "Security & Compliance":
-                return "/integrations";
-              default:
-                return "/integrations";
-            }
-          };
-          
-          return (
-            <motion.div
-              key={feature.name}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * index, duration: 0.5 }}
-              className={`rounded-xl border border-gray-200 bg-gray-50 shadow-sm transition-all duration-300 p-6 flex flex-col ${
-                feature.isEnabled 
-                  ? 'hover:bg-white hover:shadow cursor-pointer group' 
-                  : 'opacity-60 cursor-not-allowed'
-              }`}
-              onClick={feature.isEnabled ? () => window.location.href = getLink(feature.name) : undefined}
-            >
-              {feature.name === "Bill.com Automation" ? (
-                <Image src="/billcom.png" alt="Bill.com" width={28} height={28} className="mb-4" />
-              ) : feature.name === "QuickBooks Integration" ? (
-                <Image src="/quickbooks.png" alt="QuickBooks" width={28} height={28} className="mb-4" />
-              ) : feature.name === "Zapier Workflows" ? (
-                <Image src="/zapier.png" alt="Zapier" width={28} height={28} className="mb-4" />
-              ) : (
-                <Icon className={`w-6 h-6 mb-4 ${
-                  feature.isEnabled 
-                    ? 'text-gray-700 group-hover:text-blue-600' 
-                    : 'text-gray-400'
-                }`} />
-              )}
-              <h3 className={`text-base font-medium mb-2 ${
-                feature.isEnabled ? 'text-gray-900' : 'text-gray-500'
-              }`}>
-                {feature.name}
-              </h3>
-              <p className={`text-sm leading-relaxed mb-4 h-16 line-clamp-4 ${
-                feature.isEnabled ? 'text-gray-500' : 'text-gray-400'
-              }`}>
-                {feature.description}
-              </p>
-              <div className={`mt-auto text-xs font-medium ${
-                feature.isEnabled 
-                  ? 'text-blue-600 group-hover:text-blue-700' 
-                  : 'text-orange-500'
-              }`}>
-                {feature.isEnabled ? 'Explore Integration →' : 'Coming Soon'}
-              </div>
-            </motion.div>
-          );
-        })}
+      <div className="mt-16 max-w-6xl w-full px-4">
+        {(() => {
+          const BentoGrid = require("@/components/integrations/BentoGrid").default;
+          const { registry } = require("@/lib/integrations/registry");
+          return <BentoGrid providers={registry} />;
+        })()}
       </div>
 
       {/* Footer */}

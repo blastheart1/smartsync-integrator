@@ -8,41 +8,31 @@ import { useState } from "react";
 import Link from "next/link";
 
 export default function IntegrationsPage() {
-  const [activeTab, setActiveTab] = useState("overview");
   const [showTerminal, setShowTerminal] = useState(false);
   const [terminalOutput, setTerminalOutput] = useState<string[]>([]);
   const [isTesting, setIsTesting] = useState(false);
+  
+  // New bento grid data
+  // Dynamically sourced from registry
+  // Kept local to avoid refactor of the rest of the page for now
+  const { registry } = require("@/lib/integrations/registry");
 
-  const integrations = [
+  // Testing console sources (kept minimal and static for now)
+  const testingIntegrations = [
     {
       name: "QuickBooks Online",
-      description: "Sync invoices, bills, and payments with QuickBooks Online",
-      icon: FileCode2,
-      status: "connected",
-      lastSync: "2 minutes ago",
-      apiEndpoint: "/api/integrations/quickbooks",
-      features: ["Invoice Sync", "Payment Tracking", "Customer Management", "Real-time Data"],
-      isEnabled: true
+      isEnabled: true,
+      apiEndpoint: "/api/integrations/quickbooks"
     },
     {
       name: "Bill.com",
-      description: "Automate payable workflows and vendor management",
-      icon: BillComIcon,
-      status: "in_progress",
-      lastSync: "Coming soon",
-      apiEndpoint: "/api/integrations/billdotcom",
-      features: ["Vendor Management", "Payment Processing", "Invoice Automation", "Spend Tracking"],
-      isEnabled: false
+      isEnabled: false,
+      apiEndpoint: "/api/integrations/billdotcom"
     },
     {
       name: "Zapier",
-      description: "Connect with 5000+ apps and automate workflows",
-      icon: Zap,
-      status: "connected",
-      lastSync: "Ready for configuration",
-      apiEndpoint: "/api/integrations/zapier",
-      features: ["Workflow Automation", "Multi-app Integration", "Trigger Actions", "Data Sync"],
-      isEnabled: true
+      isEnabled: true,
+      apiEndpoint: "/api/integrations/zapier"
     }
   ];
 
@@ -192,93 +182,12 @@ export default function IntegrationsPage() {
           <p className="text-gray-600">Manage and monitor your third-party integrations</p>
         </motion.div>
 
-        {/* Integration Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          {integrations.map((integration, index) => {
-            const Icon = integration.icon;
-            return (
-              <motion.div
-                key={integration.name}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className={`bg-white rounded-lg shadow-md p-6 border border-gray-200 flex flex-col ${
-                  !integration.isEnabled ? 'opacity-60' : ''
-                }`}
-              >
-                <div className="flex items-center mb-4">
-                  <div className="mr-3 grid place-items-center">
-                    {integration.name === "Bill.com" ? (
-                      <Image src="/billcom.png" alt="Bill.com" width={32} height={32} />
-                    ) : integration.name === "QuickBooks Online" ? (
-                      <Image src="/quickbooks.png" alt="QuickBooks" width={32} height={32} />
-                    ) : integration.name === "Zapier" ? (
-                      <Image src="/zapier.png" alt="Zapier" width={32} height={32} />
-                    ) : (
-                      <Icon className={`w-6 h-6 ${
-                        integration.isEnabled ? 'text-blue-600' : 'text-gray-400'
-                      }`} />
-                    )}
-                  </div>
-                  <div>
-                    <h3 className={`text-lg font-semibold ${
-                      integration.isEnabled ? 'text-gray-900' : 'text-gray-500'
-                    }`}>{integration.name}</h3>
-                    <div className="flex items-center">
-                      {integration.status === "connected" ? (
-                        <CheckCircle className="w-4 h-4 text-green-500 mr-1" />
-                      ) : integration.status === "in_progress" ? (
-                        <AlertCircle className="w-4 h-4 text-orange-500 mr-1" />
-                      ) : (
-                        <AlertCircle className="w-4 h-4 text-yellow-500 mr-1" />
-                      )}
-                      <span className={`text-sm ${
-                        integration.status === "connected" ? "text-green-600" : 
-                        integration.status === "in_progress" ? "text-orange-600" : "text-yellow-600"
-                      }`}>
-                        {integration.status === "in_progress" ? "In Progress" : integration.status}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                
-                <p className={`text-sm mb-4 h-10 line-clamp-2 ${
-                  integration.isEnabled ? 'text-gray-600' : 'text-gray-400'
-                }`}>{integration.description}</p>
-                
-                <div className="space-y-2 mb-4 flex-grow">
-                  {integration.features.map((feature, idx) => (
-                    <div key={idx} className={`flex items-center text-sm ${
-                      integration.isEnabled ? 'text-gray-500' : 'text-gray-400'
-                    }`}>
-                      <CheckCircle className={`w-3 h-3 mr-2 ${
-                        integration.isEnabled ? 'text-green-500' : 'text-gray-400'
-                      }`} />
-                      {feature}
-                    </div>
-                  ))}
-                </div>
-
-                <div className={`text-xs mb-4 ${
-                  integration.isEnabled ? 'text-gray-400' : 'text-gray-300'
-                }`}>
-                  Last sync: {integration.lastSync}
-                </div>
-
-                <button
-                  onClick={() => integration.isEnabled && setActiveTab(integration.name.toLowerCase().replace(/\s+/g, ''))}
-                  disabled={!integration.isEnabled}
-                  className={`w-full py-2 px-4 rounded-md transition-colors text-sm mt-auto ${
-                    integration.isEnabled 
-                      ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  {integration.isEnabled ? 'Manage Integration' : 'Coming Soon'}
-                </button>
-              </motion.div>
-            );
-          })}
+        {/* New Bento Grid */}
+        <div className="mb-8">
+          {(() => {
+            const BentoGrid = require("@/components/integrations/BentoGrid").default;
+            return <BentoGrid providers={registry} />;
+          })()}
         </div>
 
         {/* API Testing Section */}
@@ -314,7 +223,7 @@ export default function IntegrationsPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-4">
-            {integrations.map((integration) => (
+            {testingIntegrations.map((integration) => (
               <div key={integration.name} className={`border border-gray-200 rounded-lg p-4 ${
                 !integration.isEnabled ? 'opacity-60' : ''
               }`}>
@@ -448,74 +357,7 @@ export default function IntegrationsPage() {
           </motion.div>
         )}
 
-        {/* Integration Details */}
-        {activeTab !== "overview" && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-8 bg-white rounded-lg shadow-md p-6 border border-gray-200"
-          >
-            <div className="flex items-center mb-4">
-              <Settings className="w-5 h-5 text-gray-600 mr-2" />
-              <h2 className="text-lg font-semibold text-gray-900">
-                {integrations.find(i => i.name.toLowerCase().replace(/\s+/g, '') === activeTab)?.name} Configuration
-              </h2>
-            </div>
-            
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <p className="text-sm text-blue-800">
-                <strong>Note:</strong> This configuration panel is for demonstration purposes. 
-                It shows the concept of managing integration settings through a user-friendly interface. 
-                In a production environment, this would allow updating API credentials and sync preferences without manual file editing.
-              </p>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="font-medium text-gray-900 mb-3">API Credentials</h3>
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-sm text-gray-600 mb-1">Client ID</label>
-                    <input 
-                      type="text" 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                      placeholder="Enter client ID"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-gray-600 mb-1">Client Secret</label>
-                    <input 
-                      type="password" 
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                      placeholder="Enter client secret"
-                    />
-                  </div>
-                  <button className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-sm">
-                    Save Configuration
-                  </button>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="font-medium text-gray-900 mb-3">Sync Settings</h3>
-                <div className="space-y-3">
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" defaultChecked />
-                    <span className="text-sm text-gray-600">Enable automatic sync</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    <span className="text-sm text-gray-600">Sync on real-time updates</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" defaultChecked />
-                    <span className="text-sm text-gray-600">Include historical data</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
+        {/* Configuration panel removed in favor of dedicated provider pages */}
       </div>
     </main>
   );
