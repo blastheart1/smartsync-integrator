@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/lib/env";
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
-
 export async function GET(request: NextRequest) {
+  let prisma: PrismaClient;
+  
   try {
     console.log('🔄 Google OAuth Callback - Processing');
+    prisma = new PrismaClient();
     
     const { searchParams } = new URL(request.url);
     const code = searchParams.get('code');
@@ -94,6 +95,10 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('❌ Error in Google OAuth callback:', error);
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/integrations/googlesheets?error=callback_error`);
+  } finally {
+    if (prisma) {
+      await prisma.$disconnect();
+    }
   }
 }
 
