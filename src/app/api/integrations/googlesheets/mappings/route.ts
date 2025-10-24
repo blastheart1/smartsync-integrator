@@ -80,6 +80,8 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const prisma = new PrismaClient();
+  
   try {
     console.log('➕ Google Sheets API - Create Integration Mapping');
     
@@ -153,10 +155,14 @@ export async function POST(request: NextRequest) {
       },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
 export async function PATCH(request: NextRequest) {
+  const prisma = new PrismaClient();
+  
   try {
     console.log('✏️ Google Sheets API - Update Integration Mapping');
     
@@ -204,10 +210,14 @@ export async function PATCH(request: NextRequest) {
       },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
 export async function DELETE(request: NextRequest) {
+  const prisma = new PrismaClient();
+  
   try {
     console.log('🗑️ Google Sheets API - Delete Integration Mapping');
     
@@ -254,5 +264,7 @@ export async function DELETE(request: NextRequest) {
       },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }
