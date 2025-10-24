@@ -144,7 +144,7 @@ export async function listUserAccounts(userId: string): Promise<GoogleAccount[]>
     console.log(`[TOKEN_STORAGE] Found ${accounts.length} raw accounts from database`);
     console.log('[TOKEN_STORAGE] Raw accounts data:', JSON.stringify(accounts, null, 2));
     
-    const mappedAccounts = accounts.map(account => ({
+    const mappedAccounts = accounts.map((account: any) => ({
       id: account.id,
       email: account.email,
       accessToken: account.accessToken,
@@ -210,22 +210,28 @@ export async function getActiveAccount(userId: string): Promise<GoogleAccount | 
  * Set active account for a user
  */
 export async function setActiveAccount(userId: string, accountId: string): Promise<void> {
-  // Set all accounts to inactive
-  await prisma.googleAccount.updateMany({
-    where: { userId },
-    data: { isActive: false }
-  });
+  const prisma = new PrismaClient();
   
-  // Set the specified account as active
-  await prisma.googleAccount.update({
-    where: { id: accountId },
-    data: { 
-      isActive: true,
-      lastUsed: new Date()
-    }
-  });
-  
-  console.log('✅ Active Google account updated');
+  try {
+    // Set all accounts to inactive
+    await prisma.googleAccount.updateMany({
+      where: { userId },
+      data: { isActive: false }
+    });
+    
+    // Set the specified account as active
+    await prisma.googleAccount.update({
+      where: { id: accountId },
+      data: { 
+        isActive: true,
+        lastUsed: new Date()
+      }
+    });
+    
+    console.log('✅ Active Google account updated');
+  } finally {
+    await prisma.$disconnect();
+  }
 }
 
 /**
@@ -241,6 +247,8 @@ export async function getTokenCacheInfo(userId: string, accountId?: string): Pro
     email: string;
   };
 }> {
+  const prisma = new PrismaClient();
+  
   try {
     const account = accountId 
       ? await prisma.googleAccount.findUnique({ where: { id: accountId } })
@@ -269,5 +277,7 @@ export async function getTokenCacheInfo(userId: string, accountId?: string): Pro
   } catch (error) {
     console.error('Error getting token cache info:', error);
     return { hasCache: false };
+  } finally {
+    await prisma.$disconnect();
   }
 }

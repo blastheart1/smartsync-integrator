@@ -325,54 +325,56 @@ function GoogleSheetsPageContent() {
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <div className="flex items-center gap-4">
-              <Link 
-                href="/" 
-                className="text-gray-600 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1"
-                title="Home"
-              >
-                <Home className="w-5 h-5" />
-              </Link>
+            <div className="flex items-center">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Google Sheets Integration</h1>
                 <p className="text-gray-600 mt-1">Connect and sync your Google Sheets with other apps</p>
               </div>
             </div>
-            {accounts.length > 0 ? (
-              <button
-                onClick={() => setShowAccountManager(true)}
-                className="btn btn-primary btn-md"
+            <div className="flex items-center gap-3">
+              {accounts.length > 0 ? (
+                <button
+                  onClick={() => setShowAccountManager(true)}
+                  className="btn btn-primary btn-md"
+                >
+                  {(() => {
+                    const activeAccount = accounts.find(acc => acc.isActive);
+                    return activeAccount ? (
+                      <>
+                        {activeAccount.avatar ? (
+                          <img src={activeAccount.avatar} alt={activeAccount.email} className="w-6 h-6 rounded-full" />
+                        ) : (
+                          <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                            <div className="w-4 h-4 bg-white rounded-full"></div>
+                          </div>
+                        )}
+                        <span className="text-sm">{activeAccount.email}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4" />
+                        Connect Google Account
+                      </>
+                    );
+                  })()}
+                </button>
+              ) : (
+                <button
+                  onClick={handleConnectAccount}
+                  className="btn btn-primary btn-md"
+                >
+                  <Plus className="w-4 h-4" />
+                  Connect Google Account
+                </button>
+              )}
+              <Link 
+                href="/"
+                className="flex items-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors"
               >
-                {(() => {
-                  const activeAccount = accounts.find(acc => acc.isActive);
-                  return activeAccount ? (
-                    <>
-                      {activeAccount.avatar ? (
-                        <img src={activeAccount.avatar} alt={activeAccount.email} className="w-6 h-6 rounded-full" />
-                      ) : (
-                        <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-                          <div className="w-4 h-4 bg-white rounded-full"></div>
-                        </div>
-                      )}
-                      <span className="text-sm">{activeAccount.email}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="w-4 h-4" />
-                      Connect Google Account
-                    </>
-                  );
-                })()}
-              </button>
-            ) : (
-              <button
-                onClick={handleConnectAccount}
-                className="btn btn-primary btn-md"
-              >
-                <Plus className="w-4 h-4" />
-                Connect Google Account
-              </button>
-            )}
+                <Home className="w-5 h-5 mr-2" />
+                Home
+              </Link>
+            </div>
           </div>
         </div>
       </div>
