@@ -17,6 +17,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: spreadsheets
+    }, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      }
     });
     
   } catch (error) {
@@ -25,12 +31,37 @@ export async function GET(request: NextRequest) {
     console.error('[GOOGLE_SPREADSHEETS_API] Error message:', error instanceof Error ? error.message : 'Unknown error');
     console.error('[GOOGLE_SPREADSHEETS_API] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     
+    // Check if it's an authentication error
+    const errorMessage = error instanceof Error ? error.message : 'Failed to list spreadsheets';
+    const isAuthError = errorMessage.includes('No active Google account') || 
+                       errorMessage.includes('Google account not found') ||
+                       errorMessage.includes('No valid access token');
+    
     return NextResponse.json(
       { 
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to list spreadsheets' 
+        error: errorMessage,
+        requiresAuth: isAuthError
       },
-      { status: 500 }
+      { 
+        status: isAuthError ? 401 : 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        }
+      }
     );
   }
+}
+
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    }
+  });
 }
