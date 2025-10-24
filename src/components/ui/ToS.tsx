@@ -43,9 +43,9 @@ export default function ToSModal({ onAgree }: ToSModalProps) {
             It is not a commercial product.
           </p>
           <p>
-            This demo connects to live <strong>sandbox</strong> APIs (e.g., QuickBooks, Bill.com, Zapier) to demonstrate
+            This demo connects to live <strong>sandbox</strong> APIs (e.g., QuickBooks, Bill.com, Zapier, Google Sheets) to demonstrate
             real integrations. Data shown is retrieved from these sandbox services in real time and is <strong>not </strong>
-            mock or hardcoded data.
+            mock or hardcoded data. HubSpot and Salesforce integrations are coming soon.
           </p>
           <p>
             When you upload or enter data, it may be processed temporarily and is not stored or shared.
@@ -88,6 +88,36 @@ export default function ToSModal({ onAgree }: ToSModalProps) {
                   className="text-blue-600 hover:underline"
                 >
                   Zapier Platform Docs
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://developers.google.com/sheets/api"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  Google Sheets API Docs
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://developers.hubspot.com/docs/api/overview"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  HubSpot API Docs (Coming Soon)
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  Salesforce REST API Docs (Coming Soon)
                 </a>
               </li>
             </ul>

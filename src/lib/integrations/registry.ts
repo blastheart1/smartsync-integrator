@@ -109,7 +109,7 @@ export const registry: ProviderConfig[] = [
     icon: "/hubspot.png",
     description: "Sync contacts, deals, and companies with HubSpot CRM",
     oauth: "oauth2",
-    status: "available",
+    status: "coming_soon",
     color: "#FF7A59",
     docsUrl: "https://developers.hubspot.com/docs/api/overview",
     capability: {
@@ -131,7 +131,7 @@ export const registry: ProviderConfig[] = [
     icon: "/salesforce.png",
     description: "Connect with Salesforce CRM for accounts, contacts, and opportunities",
     oauth: "oauth2",
-    status: "available",
+    status: "coming_soon",
     color: "#00A1E0",
     docsUrl: "https://developer.salesforce.com/docs",
     capability: {
