@@ -1,7 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
-
 interface TokenResponse {
   access_token: string;
   refresh_token?: string;
@@ -26,6 +24,7 @@ interface GoogleAccount {
  */
 export async function getValidAccessToken(userId: string, accountId?: string): Promise<string> {
   console.log('[TOKEN_STORAGE] getValidAccessToken called with userId:', userId, 'accountId:', accountId);
+  const prisma = new PrismaClient();
   
   try {
     // If no accountId specified, get the active account
@@ -98,6 +97,8 @@ export async function getValidAccessToken(userId: string, accountId?: string): P
     console.error('[TOKEN_STORAGE] Error message:', error instanceof Error ? error.message : 'Unknown error');
     console.error('[TOKEN_STORAGE] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     throw error;
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
@@ -131,6 +132,7 @@ export async function refreshGoogleToken(refreshToken: string): Promise<TokenRes
  */
 export async function listUserAccounts(userId: string): Promise<GoogleAccount[]> {
   console.log('[TOKEN_STORAGE] listUserAccounts called with userId:', userId);
+  const prisma = new PrismaClient();
   
   try {
     console.log('[TOKEN_STORAGE] Querying database for Google accounts');
@@ -164,6 +166,8 @@ export async function listUserAccounts(userId: string): Promise<GoogleAccount[]>
     console.error('[TOKEN_STORAGE] Error message:', error instanceof Error ? error.message : 'Unknown error');
     console.error('[TOKEN_STORAGE] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     throw error;
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
