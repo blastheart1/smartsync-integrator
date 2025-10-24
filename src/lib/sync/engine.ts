@@ -295,8 +295,8 @@ export class SyncEngine {
     });
 
     // Calculate success rate from recent syncs
-    const recentSyncs = mapping.syncLogs.filter(log => log.status !== "running");
-    const successfulSyncs = recentSyncs.filter(log => log.status === "success");
+    const recentSyncs = mapping.syncLogs.filter((log: any) => log.status !== "running");
+    const successfulSyncs = recentSyncs.filter((log: any) => log.status === "success");
     const successRate = recentSyncs.length > 0 ? (successfulSyncs.length / recentSyncs.length) * 100 : 0;
 
     // Calculate next sync time based on frequency
