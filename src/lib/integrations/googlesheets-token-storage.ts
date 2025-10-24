@@ -175,29 +175,35 @@ export async function listUserAccounts(userId: string): Promise<GoogleAccount[]>
  * Get the active Google account for a user
  */
 export async function getActiveAccount(userId: string): Promise<GoogleAccount | null> {
-  const account = await prisma.googleAccount.findFirst({
-    where: { 
-      userId,
-      isActive: true 
-    },
-    orderBy: { lastUsed: 'desc' }
-  });
+  const prisma = new PrismaClient();
   
-  if (!account) {
-    return null;
+  try {
+    const account = await prisma.googleAccount.findFirst({
+      where: { 
+        userId,
+        isActive: true 
+      },
+      orderBy: { lastUsed: 'desc' }
+    });
+    
+    if (!account) {
+      return null;
+    }
+    
+    return {
+      id: account.id,
+      email: account.email,
+      accessToken: account.accessToken,
+      refreshToken: account.refreshToken,
+      expiresAt: account.expiresAt,
+      scope: account.scope,
+      avatar: account.avatar || undefined,
+      isActive: account.isActive,
+      lastUsed: account.lastUsed || undefined
+    };
+  } finally {
+    await prisma.$disconnect();
   }
-  
-  return {
-    id: account.id,
-    email: account.email,
-    accessToken: account.accessToken,
-    refreshToken: account.refreshToken,
-    expiresAt: account.expiresAt,
-    scope: account.scope,
-    avatar: account.avatar || undefined,
-    isActive: account.isActive,
-    lastUsed: account.lastUsed || undefined
-  };
 }
 
 /**
